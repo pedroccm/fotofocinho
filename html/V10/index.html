@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Retratos de Pet com IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --sage: #9CAF88;
+      --sage-dark: #7A8F6C;
+      --sage-light: #C5D4B8;
+      --terracotta: #C17F59;
+      --terracotta-dark: #A66B47;
+      --sand: #F5F0E8;
+      --cream: #FFFDF9;
+      --earth: #5C4B3A;
+      --text: #3D3229;
+      --text-muted: #8B7E72;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--sand);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Organic blob shapes */
+    .blob {
+      position: fixed;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    .blob-1 {
+      width: 500px;
+      height: 500px;
+      background: var(--sage-light);
+      top: -150px;
+      right: -100px;
+      animation: morph 15s ease-in-out infinite;
+    }
+
+    .blob-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--terracotta);
+      opacity: 0.2;
+      bottom: -100px;
+      left: -100px;
+      animation: morph 20s ease-in-out infinite reverse;
+    }
+
+    @keyframes morph {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, var(--sand) 0%, transparent 100%);
+    }
+
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--earth);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 100px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: rgba(156, 175, 136, 0.2);
+    }
+
+    .nav-link.primary {
+      background: var(--sage);
+      color: white;
+    }
+
+    .nav-link.primary:hover {
+      background: var(--sage-dark);
+    }
+
+    /* Content */
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px;
+    }
+
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .hero-content {
+      max-width: 520px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--cream);
+      border: 2px solid var(--sage-light);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--sage-dark);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 60px;
+      font-weight: 500;
+      line-height: 1.1;
+      color: var(--earth);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 .highlight {
+      color: var(--terracotta);
+      font-style: italic;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--terracotta);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(193, 127, 89, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--sage);
+      color: var(--sage-dark);
+    }
+
+    .btn-outline:hover {
+      background: var(--sage);
+      color: white;
+    }
+
+    /* Hero Visual - Polaroid style */
+    .hero-visual {
+      position: relative;
+    }
+
+    .polaroid-stack {
+      position: relative;
+      width: 100%;
+      height: 500px;
+    }
+
+    .polaroid {
+      position: absolute;
+      width: 280px;
+      background: white;
+      padding: 16px 16px 48px;
+      border-radius: 4px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: all 0.4s;
+    }
+
+    .polaroid:nth-child(1) {
+      top: 20px;
+      left: 20px;
+      transform: rotate(-8deg);
+    }
+
+    .polaroid:nth-child(2) {
+      top: 60px;
+      left: 140px;
+      transform: rotate(5deg);
+      z-index: 1;
+    }
+
+    .polaroid:nth-child(3) {
+      top: 180px;
+      left: 60px;
+      transform: rotate(-3deg);
+      z-index: 2;
+    }
+
+    .polaroid:hover {
+      transform: rotate(0deg) scale(1.05);
+      z-index: 10;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .polaroid-label {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Fraunces', serif;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Section */
+    .section {
+      padding: 100px 48px;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 64px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: 44px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 17px;
+      color: var(--text-muted);
+    }
+
+    /* Steps */
+    .steps-container {
+      background: var(--cream);
+      border-radius: 32px;
+      padding: 64px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-number {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--terracotta);
+      background: var(--sand);
+      border-radius: 50%;
+    }
+
+    .step h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Styles Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .gallery-card {
+      background: var(--cream);
+      border-radius: 24px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+    }
+
+    .gallery-image {
+      height: 320px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .gallery-info {
+      padding: 24px;
+      text-align: center;
+    }
+
+    .gallery-info h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 4px;
+    }
+
+    .gallery-info span {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: var(--cream);
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+
+    .price-card:hover {
+      border-color: var(--sage-light);
+    }
+
+    .price-card.featured {
+      background: white;
+      border-color: var(--terracotta);
+      position: relative;
+    }
+
+    .price-card.featured::before {
+      content: 'Favorito';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 20px;
+      background: var(--terracotta);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 100px;
+    }
+
+    .price-card h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 20px;
+    }
+
+    .price-value {
+      font-family: 'Fraunces', serif;
+      font-size: 52px;
+      font-weight: 600;
+      color: var(--earth);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .price-card.featured .price-value {
+      color: var(--terracotta);
+    }
+
+    .price-value small {
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 32px 0;
+    }
+
+    .price-card li {
+      padding: 12px 0;
+      font-size: 14px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--sand);
+    }
+
+    .price-card li:last-child {
+      border-bottom: none;
+    }
+
+    .price-card .btn {
+      width: 100%;
+    }
+
+    .btn-sage {
+      background: var(--sage);
+      color: white;
+    }
+
+    .btn-sage:hover {
+      background: var(--sage-dark);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px;
+      text-align: center;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .footer-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--earth);
+      margin-bottom: 8px;
+    }
+
+    .footer p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 1000px) {
+      .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 44px;
+      }
+
+      .hero-buttons {
+        justify-content: center;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .gallery-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Organic blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="logo">fotofocinho</a>
+    <div class="nav-links">
+      <a href="#process" class="nav-link">Processo</a>
+      <a href="#gallery" class="nav-link">Galeria</a>
+      <a href="#pricing" class="nav-link">Precos</a>
+      <a href="login.html" class="nav-link">Entrar</a>
+      <a href="register.html" class="nav-link primary">Comecar</a>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">Feito com carinho</div>
+          <h1>Seu pet como <span class="highlight">obra de arte</span></h1>
+          <p>Criamos retratos artisticos unicos do seu melhor amigo, combinando inteligencia artificial com estilos classicos de pintura.</p>
+          <div class="hero-buttons">
+            <a href="register.html" class="btn btn-primary">
+              Criar retrato
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a href="#gallery" class="btn btn-outline">Ver galeria</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="polaroid-stack">
+            <div class="polaroid">
+              <img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait">
+              <span class="polaroid-label">Max - Renascenca</span>
+            </div>
+            <div class="polaroid">
+              <img src="../../samples/output/gato/baroque.jpg" alt="Portrait">
+              <span class="polaroid-label">Luna - Barroco</span>
+            </div>
+            <div class="polaroid">
+              <img src="../../samples/output/dog2/royal.jpg" alt="Portrait">
+              <span class="polaroid-label">Thor - Real</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section class="section" id="process">
+      <div class="section-header">
+        <span class="section-label">Como funciona</span>
+        <h2 class="section-title">Simples e encantador</h2>
+        <p class="section-desc">Tres passos para eternizar seu companheiro</p>
+      </div>
+      <div class="steps-container">
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Envie a foto</h3>
+            <p>Escolha uma foto clara do seu pet. Pode ser do celular mesmo!</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Escolha o estilo</h3>
+            <p>Renascenca, Barroco, Real... qual combina mais com seu pet?</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Receba sua arte</h3>
+            <p>Em minutos, seu retrato esta pronto para decorar sua casa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="section" id="gallery">
+      <div class="section-header">
+        <span class="section-label">Estilos</span>
+        <h2 class="section-title">Nossa galeria</h2>
+        <p class="section-desc">Cada estilo conta uma historia diferente</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-card">
+          <div class="gallery-image" style="background-image: url('../../samples/output/dog3/renaissance.jpg');"></div>
+          <div class="gallery-info">
+            <h3>Renascenca</h3>
+            <span>Classico e atemporal</span>
+          </div>
+        </div>
+        <div class="gallery-card">
+          <div class="gallery-image" style="background-image: url('../../samples/output/gato2/baroque.jpg');"></div>
+          <div class="gallery-info">
+            <h3>Barroco</h3>
+            <span>Dramatico e elegante</span>
+          </div>
+        </div>
+        <div class="gallery-card">
+          <div class="gallery-image" style="background-image: url('../../samples/output/dog4/royal.jpg');"></div>
+          <div class="gallery-info">
+            <h3>Real</h3>
+            <span>Nobre e majestoso</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="section" id="pricing">
+      <div class="section-header">
+        <span class="section-label">Planos</span>
+        <h2 class="section-title">Quanto custa?</h2>
+        <p class="section-desc">Opcoes para todos os bolsos</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Digital</h3>
+          <div class="price-value">R$29<small>/un</small></div>
+          <ul>
+            <li>Alta resolucao</li>
+            <li>Pronto em 5 min</li>
+            <li>Download ilimitado</li>
+            <li>3 estilos</li>
+          </ul>
+          <button class="btn btn-outline">Escolher</button>
+        </div>
+        <div class="price-card featured">
+          <h3>Canvas</h3>
+          <div class="price-value">R$199<small>/un</small></div>
+          <ul>
+            <li>Impressao em canvas</li>
+            <li>Moldura inclusa</li>
+            <li>Frete gratis</li>
+            <li>Garantia vitalicia</li>
+          </ul>
+          <button class="btn btn-primary">Escolher</button>
+        </div>
+        <div class="price-card">
+          <h3>Fine Art</h3>
+          <div class="price-value">R$89<small>/un</small></div>
+          <ul>
+            <li>Papel fine art</li>
+            <li>Cores vibrantes</li>
+            <li>Varios tamanhos</li>
+            <li>Envio seguro</li>
+          </ul>
+          <button class="btn btn-sage">Escolher</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-logo">fotofocinho</div>
+      <p>&copy; 2025 Fotofocinho. Feito com amor para pets.</p>
+    </footer>
+  </div>
+</body>
+</html>

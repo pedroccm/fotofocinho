@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+:root {
+  --sage: #9CAF88;
+  --sage-dark: #7A8F6C;
+  --sage-light: #C5D4B8;
+  --terracotta: #C17F59;
+  --terracotta-dark: #A66B47;
+  --sand: #F5F0E8;
+  --cream: #FFFDF9;
+  --earth: #5C4B3A;
+  --text: #3D3229;
+  --text-muted: #8B7E72;
+  --success: #6B9B5B;
+  --warning: #D4A24C;
+  --info: #5B8B9B;
+  --error: #C75050;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(156, 175, 136, 0.3);
+  color: var(--earth);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Nunito", sans-serif;
+  background: var(--sand);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes morph {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-scaleIn {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.blob {
+  position: fixed;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  opacity: 0.4;
+  z-index: 0;
+  pointer-events: none;
+}
+.blob-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--sage-light);
+  top: -150px;
+  right: -100px;
+  animation: morph 15s ease-in-out infinite;
+}
+.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: var(--terracotta);
+  opacity: 0.2;
+  bottom: -100px;
+  left: -100px;
+  animation: morph 20s ease-in-out infinite reverse;
+}
+
+.trustpilot-star {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background: #00b67a;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--sand); }
+::-webkit-scrollbar-thumb { background: var(--sage-light); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sage); }

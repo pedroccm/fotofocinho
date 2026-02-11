@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --cream: #FDF8F3;
+      --warm-white: #FFFAF5;
+      --brown: #8B7355;
+      --brown-dark: #5C4A3A;
+      --accent: #D4A574;
+      --text: #3D3D3D;
+      --text-muted: #8A8A8A;
+      --border: #E8E0D8;
+      --error: #DC3545;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Left Side - Form */
+    .form-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 64px;
+      background: var(--warm-white);
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--brown-dark);
+      margin-bottom: 64px;
+      text-decoration: none;
+    }
+
+    .form-container {
+      max-width: 400px;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      color: var(--brown-dark);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .form-input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-family: inherit;
+      font-size: 15px;
+      background: var(--cream);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--brown);
+      background: white;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: var(--brown);
+    }
+
+    .form-error {
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid rgba(220, 53, 69, 0.2);
+      color: var(--error);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--brown);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--brown-dark);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .social-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-btn {
+      flex: 1;
+      padding: 14px;
+      background: var(--cream);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .social-btn:hover {
+      border-color: var(--brown);
+      background: white;
+    }
+
+    .form-footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .form-footer a {
+      color: var(--brown);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Right Side - Visual */
+    .visual-side {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--brown) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-side::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+    }
+
+    .visual-side::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .visual-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: white;
+    }
+
+    .visual-icon {
+      font-size: 120px;
+      margin-bottom: 32px;
+    }
+
+    .visual-content h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .visual-content p {
+      font-size: 16px;
+      opacity: 0.9;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+
+      .visual-side {
+        display: none;
+      }
+
+      .form-side {
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Form Side -->
+  <div class="form-side">
+    <a href="index.html" class="logo">fotofocinho</a>
+
+    <div class="form-container">
+      <h1>Bem-vindo de volta</h1>
+      <p class="subtitle">Entre para acessar seus retratos</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="password" placeholder="Digite sua senha" required style="padding-right: 50px;">
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-error" id="errorBox">
+          Email ou senha incorretos.
+        </div>
+
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+
+      <div class="divider">
+        <span class="divider-line"></span>
+        <span class="divider-text">ou continue com</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <div class="social-buttons">
+        <button class="social-btn">Google</button>
+        <button class="social-btn">Apple</button>
+      </div>
+
+      <p class="form-footer">
+        Nao tem conta? <a href="register.html">Criar conta gratis</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Visual Side -->
+  <div class="visual-side">
+    <div class="visual-content">
+      <div class="visual-icon">🎨</div>
+      <h2>Arte que emociona</h2>
+      <p>Mais de 10.000 pets transformados em obras de arte unicas</p>
+    </div>
+  </div>
+
+  <script>
+    let showPassword = false;
+
+    function togglePassword() {
+      showPassword = !showPassword;
+      const input = document.getElementById('password');
+      const icon = document.getElementById('eyeIcon');
+
+      input.type = showPassword ? 'text' : 'password';
+
+      if (showPassword) {
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        `;
+      } else {
+        icon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      window.location.href = 'minha-conta.html';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Pet Portraits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --background: #09090b;
+      --foreground: #fafafa;
+      --card: #09090b;
+      --card-foreground: #fafafa;
+      --primary: #fafafa;
+      --primary-foreground: #18181b;
+      --secondary: #27272a;
+      --secondary-foreground: #fafafa;
+      --muted: #27272a;
+      --muted-foreground: #a1a1aa;
+      --accent: #27272a;
+      --border: #27272a;
+      --ring: #d4d4d8;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Utilities */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation */
+    .nav {
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--background);
+      z-index: 50;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      border-radius: var(--radius);
+      transition: all 0.15s;
+    }
+
+    .nav-link:hover {
+      color: var(--foreground);
+      background: var(--accent);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--secondary-foreground);
+    }
+
+    .btn-secondary:hover {
+      background: #3f3f46;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--foreground);
+    }
+
+    .btn-outline:hover {
+      background: var(--accent);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted-foreground);
+    }
+
+    .btn-ghost:hover {
+      background: var(--accent);
+      color: var(--foreground);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--secondary);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--muted-foreground);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Upload Section */
+    .section {
+      padding: 80px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      color: var(--muted-foreground);
+    }
+
+    .upload-card {
+      max-width: 600px;
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 48px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .upload-card:hover {
+      border-color: var(--muted-foreground);
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted-foreground);
+    }
+
+    .upload-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .upload-hint {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    /* Styles Grid */
+    .styles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .style-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .style-card:hover {
+      border-color: var(--muted-foreground);
+      background: var(--secondary);
+    }
+
+    .style-card.selected {
+      border-color: var(--foreground);
+      background: var(--secondary);
+    }
+
+    .style-image {
+      width: 100%;
+      aspect-ratio: 1;
+      background-size: cover;
+      background-position: center;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .style-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--foreground);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 12px;
+      background: var(--foreground);
+      color: var(--background);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 100px;
+    }
+
+    .pricing-name {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 4px;
+    }
+
+    .pricing-price {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .pricing-price span {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted-foreground);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      padding: 8px 0;
+    }
+
+    .pricing-features li svg {
+      color: var(--foreground);
+      flex-shrink: 0;
+    }
+
+    .pricing-btn {
+      width: 100%;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      margin-top: 80px;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-link {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      transition: color 0.15s;
+    }
+
+    .footer-link:hover {
+      color: var(--foreground);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 280px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">fotofocinho</a>
+      <div class="nav-links">
+        <a href="#upload" class="nav-link">Criar</a>
+        <a href="#styles" class="nav-link">Estilos</a>
+        <a href="#pricing" class="nav-link">Precos</a>
+        <a href="login.html" class="nav-link">Entrar</a>
+        <a href="#upload" class="btn btn-primary" style="margin-left: 8px;">Comecar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        10.000+ pets transformados
+      </div>
+      <h1 class="hero-title">Retratos de pet<br>com inteligencia artificial</h1>
+      <p class="hero-subtitle">
+        Transforme a foto do seu pet em uma obra de arte classica.
+        Simples, rapido e sem complicacao.
+      </p>
+      <div class="hero-actions">
+        <a href="#upload" class="btn btn-primary">Criar retrato gratis</a>
+        <a href="#pricing" class="btn btn-outline">Ver precos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Upload -->
+  <section class="section" id="upload">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Envie a foto</h2>
+        <p class="section-desc">Arraste ou clique para fazer upload</p>
+      </div>
+      <div class="upload-card" onclick="this.innerHTML = '<img src=\'../../samples/output/dog5/renaissance.jpg\' style=\'width:100%;border-radius:8px;\'/>'">
+        <div class="upload-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p class="upload-title">Clique para enviar</p>
+        <p class="upload-hint">JPG ou PNG, ate 10MB</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Styles -->
+  <section class="section" id="styles">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Escolha o estilo</h2>
+        <p class="section-desc">Selecione um estilo para seu retrato</p>
+      </div>
+      <div class="styles-grid">
+        <div class="style-card selected">
+          <div class="style-image" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+          <p class="style-name">Renascenca</p>
+        </div>
+        <div class="style-card">
+          <div class="style-image" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+          <p class="style-name">Barroco</p>
+        </div>
+        <div class="style-card">
+          <div class="style-image" style="background-image: url('../../samples/output/dog2/victorian.jpg');"></div>
+          <p class="style-name">Vitoriano</p>
+        </div>
+        <div class="style-card">
+          <div class="style-image" style="background-image: url('../../samples/output/dog3/military.jpg');"></div>
+          <p class="style-name">Militar</p>
+        </div>
+        <div class="style-card">
+          <div class="style-image" style="background-image: url('../../samples/output/gato1/royal.jpg');"></div>
+          <p class="style-name">Realeza</p>
+        </div>
+        <div class="style-card">
+          <div class="style-image" style="background-image: url('../../samples/output/dog4/admiral.jpg');"></div>
+          <p class="style-name">Almirante</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Escolha o formato</h2>
+        <p class="section-desc">Receba seu retrato digital ou fisico</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <p class="pricing-name">Digital</p>
+          <p class="pricing-price">R$ 29 <span>/ imagem</span></p>
+          <ul class="pricing-features">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Alta resolucao
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Sem marca d'agua
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Download imediato
+            </li>
+          </ul>
+          <button class="btn btn-outline pricing-btn">Escolher</button>
+        </div>
+        <div class="pricing-card featured">
+          <span class="pricing-badge">Popular</span>
+          <p class="pricing-name">Canvas</p>
+          <p class="pricing-price">R$ 199 <span>/ quadro</span></p>
+          <ul class="pricing-features">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Tela premium
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Pronto para pendurar
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Inclui digital
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Frete gratis
+            </li>
+          </ul>
+          <button class="btn btn-primary pricing-btn">Escolher</button>
+        </div>
+        <div class="pricing-card">
+          <p class="pricing-name">Fine Art</p>
+          <p class="pricing-price">R$ 89 <span>/ impressao</span></p>
+          <ul class="pricing-features">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Papel archival
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Tintas duradouras
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Inclui digital
+            </li>
+          </ul>
+          <button class="btn btn-outline pricing-btn">Escolher</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Termos</a>
+        <a href="#" class="footer-link">Privacidade</a>
+        <a href="#" class="footer-link">Contato</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Style card selection
+    document.querySelectorAll('.style-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 2px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .form-input:focus {
+      border-color: #c9a96e;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper .form-input {
+      padding-right: 48px;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.3s;
+    }
+
+    .password-toggle:hover {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .error-box {
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .error-box.visible {
+      display: block;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(to bottom right, #c9a96e, #dfc08a);
+      color: #0a0a0a;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(201, 169, 110, 0.3);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .card-footer {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .card-footer p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .card-footer a {
+      color: #c9a96e;
+      font-weight: 500;
+    }
+
+    .card-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .back-link a {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.3);
+      transition: color 0.3s;
+    }
+
+    .back-link a:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="logo">
+      <span class="logo-text">Fotofocinho</span>
+      <span class="logo-sub">PET PORTRAITS</span>
+    </a>
+
+    <div class="card">
+      <h1 class="card-title">Bem-vindo de volta</h1>
+      <p class="card-subtitle">Entre para acessar seus retratos</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <div class="password-wrapper">
+            <input type="password" class="form-input" id="password" placeholder="Sua senha" required>
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="error-box" id="errorBox">
+          Email ou senha incorretos
+        </div>
+
+        <button type="submit" class="btn-submit">Entrar</button>
+      </form>
+
+      <div class="card-footer">
+        <p>Nao tem uma conta? <a href="register.html">Criar conta</a></p>
+      </div>
+    </div>
+
+    <p class="back-link">
+      <a href="index.html">Voltar para a pagina inicial</a>
+    </p>
+  </div>
+
+  <script>
+    let showPassword = false;
+
+    function togglePassword() {
+      showPassword = !showPassword;
+      const input = document.getElementById('password');
+      const icon = document.getElementById('eyeIcon');
+
+      input.type = showPassword ? 'text' : 'password';
+
+      if (showPassword) {
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+          <line x1="1" y1="1" x2="23" y2="23" />
+        `;
+      } else {
+        icon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+          <circle cx="12" cy="12" r="3" />
+        `;
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Simulate login - redirect to minha-conta
+      window.location.href = 'minha-conta.html';
+    });
+  </script>
+</body>
+</html>

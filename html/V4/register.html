@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --background: #09090b;
+      --foreground: #fafafa;
+      --primary: #fafafa;
+      --primary-foreground: #18181b;
+      --secondary: #27272a;
+      --muted-foreground: #a1a1aa;
+      --border: #27272a;
+      --ring: #d4d4d8;
+      --radius: 8px;
+      --destructive: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .logo {
+      display: block;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 14px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--foreground);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-input:focus {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--muted-foreground);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+
+    .password-toggle:hover {
+      color: var(--foreground);
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 6px;
+    }
+
+    .form-error {
+      padding: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: var(--radius);
+      color: var(--destructive);
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 40px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .card-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    .card-footer a {
+      color: var(--foreground);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .card-footer a:hover {
+      color: var(--muted-foreground);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      transition: color 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--foreground);
+    }
+
+    .terms {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .terms a {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="logo">fotofocinho</a>
+
+    <div class="card">
+      <div class="card-header">
+        <h1 class="card-title">Criar conta</h1>
+        <p class="card-desc">Preencha os dados abaixo para comecar</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input type="text" class="form-input" placeholder="Seu nome" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="nome@exemplo.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="password" placeholder="Crie uma senha" minlength="6" required style="padding-right: 40px;">
+            <button type="button" class="password-toggle" onclick="togglePassword('password', 'eyeIcon1')">
+              <svg id="eyeIcon1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="form-hint">Minimo 6 caracteres</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="confirmPassword" placeholder="Digite novamente" minlength="6" required style="padding-right: 40px;">
+            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'eyeIcon2')">
+              <svg id="eyeIcon2" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-error" id="errorBox">
+          As senhas nao coincidem.
+        </div>
+
+        <button type="submit" class="btn btn-primary">Criar conta</button>
+
+        <p class="terms">
+          Ao criar conta, voce concorda com nossos<br>
+          <a href="#">Termos de Uso</a> e <a href="#">Politica de Privacidade</a>
+        </p>
+      </form>
+
+      <p class="card-footer">
+        Ja tem conta? <a href="login.html">Entrar</a>
+      </p>
+    </div>
+
+    <a href="index.html" class="back-link">← Voltar ao inicio</a>
+  </div>
+
+  <script>
+    const passwordVisibility = {
+      password: false,
+      confirmPassword: false
+    };
+
+    function togglePassword(inputId, iconId) {
+      passwordVisibility[inputId] = !passwordVisibility[inputId];
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+
+      input.type = passwordVisibility[inputId] ? 'text' : 'password';
+
+      if (passwordVisibility[inputId]) {
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        `;
+      } else {
+        icon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorBox = document.getElementById('errorBox');
+
+      if (password !== confirmPassword) {
+        errorBox.classList.add('visible');
+        return;
+      }
+
+      errorBox.classList.remove('visible');
+      window.location.href = 'minha-conta.html';
+    });
+  </script>
+</body>
+</html>

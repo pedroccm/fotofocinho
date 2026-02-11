@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Pet Portraits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #0c0c0c;
+      --white: #fafafa;
+      --gold: #b8956e;
+      --gold-light: #d4b896;
+      --gray: #888;
+      --gray-dark: #333;
+      --gray-light: #e5e5e5;
+    }
+
+    html {
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navigation - Fixed minimal */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 32px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: difference;
+    }
+
+    .nav-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 48px;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .nav-link:hover {
+      opacity: 1;
+    }
+
+    /* Sections - Full screen snap */
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      padding: 120px 48px;
+    }
+
+    /* Hero Section */
+    .hero {
+      align-items: center;
+      text-align: center;
+      background: var(--black);
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .hero-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(48px, 12vw, 160px);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      margin-bottom: 48px;
+    }
+
+    .hero-title span {
+      display: block;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      color: var(--gray);
+      max-width: 400px;
+      margin-bottom: 64px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 20px 48px;
+      border: 1px solid var(--white);
+      transition: all 0.4s ease;
+    }
+
+    .hero-cta:hover {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .hero-cta svg {
+      transition: transform 0.3s;
+    }
+
+    .hero-cta:hover svg {
+      transform: translateX(4px);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.5; transform: scaleY(0.8); }
+    }
+
+    /* Upload Section */
+    .upload-section {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 120px;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .split-content h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.1;
+      margin-bottom: 32px;
+    }
+
+    .split-content p {
+      color: var(--gray-dark);
+      margin-bottom: 48px;
+      max-width: 400px;
+    }
+
+    .upload-box {
+      aspect-ratio: 4/5;
+      border: 2px dashed var(--gray-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-box:hover {
+      border-color: var(--gold);
+      background: rgba(184, 149, 110, 0.03);
+    }
+
+    .upload-box-icon {
+      width: 64px;
+      height: 64px;
+      border: 1px solid var(--gray-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+    }
+
+    .upload-box:hover .upload-box-icon {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    .upload-box-text {
+      font-size: 14px;
+      color: var(--gray-dark);
+    }
+
+    .upload-box-hint {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 8px;
+    }
+
+    /* Styles Section */
+    .styles-section {
+      background: var(--black);
+    }
+
+    .styles-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .styles-header h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .styles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .style-card {
+      aspect-ratio: 3/4;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .style-card-bg {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.6s ease;
+    }
+
+    .style-card:hover .style-card-bg {
+      transform: scale(1.05);
+    }
+
+    .style-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 32px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .style-card:hover .style-card-overlay {
+      opacity: 1;
+    }
+
+    .style-card-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+
+    .style-card-desc {
+      font-size: 12px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Pricing Section */
+    .pricing-section {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .pricing-header h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .pricing-header p {
+      color: var(--gray-dark);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--gray-light);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      background: var(--white);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s;
+    }
+
+    .pricing-card:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .pricing-card-name {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 16px;
+    }
+
+    .pricing-card:hover .pricing-card-name {
+      color: var(--gold);
+    }
+
+    .pricing-card-price {
+      font-family: 'Instrument Serif', serif;
+      font-size: 48px;
+      font-style: italic;
+      margin-bottom: 32px;
+    }
+
+    .pricing-card-features {
+      list-style: none;
+      margin-bottom: 48px;
+      flex: 1;
+    }
+
+    .pricing-card-features li {
+      font-size: 14px;
+      color: var(--gray-dark);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .pricing-card:hover .pricing-card-features li {
+      color: var(--gray);
+      border-color: var(--gray-dark);
+    }
+
+    .pricing-btn {
+      padding: 16px 32px;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 1px solid var(--black);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .pricing-card:hover .pricing-btn {
+      border-color: var(--white);
+      color: var(--white);
+    }
+
+    .pricing-btn:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .pricing-card:hover .pricing-btn:hover {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: auto;
+      scroll-snap-align: none;
+    }
+
+    .footer-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-link {
+      font-size: 12px;
+      color: var(--gray);
+      transition: color 0.3s;
+    }
+
+    .footer-link:hover {
+      color: var(--white);
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .split-layout {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .styles-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        padding: 24px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      section {
+        padding: 100px 24px;
+      }
+
+      .styles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">Fotofocinho</a>
+    <div class="nav-links">
+      <a href="#upload" class="nav-link">Criar</a>
+      <a href="#styles" class="nav-link">Estilos</a>
+      <a href="#pricing" class="nav-link">Precos</a>
+      <a href="login.html" class="nav-link">Entrar</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-eyebrow">Retratos de Pet com IA</p>
+    <h1 class="hero-title">
+      <span>Arte que</span>
+      <span>Eterniza</span>
+    </h1>
+    <p class="hero-subtitle">
+      Transforme a foto do seu pet em uma obra de arte classica.
+      Sem cadastro. Preview gratuito.
+    </p>
+    <a href="#upload" class="hero-cta">
+      Comecar Agora
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Upload -->
+  <section class="upload-section" id="upload">
+    <div class="split-layout">
+      <div class="split-content">
+        <h2>Envie a foto do seu companheiro</h2>
+        <p>
+          Uma boa foto faz toda a diferenca. Escolha uma imagem bem iluminada
+          onde o rosto do seu pet esteja visivel e centralizado.
+        </p>
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-dark);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            JPG ou PNG
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-dark);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Ate 10MB
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-dark);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Caes, gatos e mais
+          </div>
+        </div>
+      </div>
+      <div class="upload-box" onclick="this.innerHTML = '<img src=\'../../samples/output/dog5/renaissance.jpg\' style=\'width:100%;height:100%;object-fit:cover;\'/>'">
+        <div class="upload-box-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </div>
+        <p class="upload-box-text">Clique ou arraste</p>
+        <p class="upload-box-hint">para fazer upload</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Styles -->
+  <section class="styles-section" id="styles">
+    <div class="styles-header">
+      <h2>Escolha seu Estilo</h2>
+    </div>
+    <div class="styles-grid">
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Renascenca</span>
+          <span class="style-card-desc">Seculo XV - XVI</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Barroco</span>
+          <span class="style-card-desc">Seculo XVII</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/dog2/victorian.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Vitoriano</span>
+          <span class="style-card-desc">Seculo XIX</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/dog3/military.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Militar</span>
+          <span class="style-card-desc">Classico</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/gato1/royal.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Realeza</span>
+          <span class="style-card-desc">Nobreza</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-bg" style="background-image: url('../../samples/output/dog4/admiral.jpg');"></div>
+        <div class="style-card-overlay">
+          <span class="style-card-name">Almirante</span>
+          <span class="style-card-desc">Naval</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-header">
+      <h2>Formatos</h2>
+      <p>Escolha como deseja receber sua obra</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <span class="pricing-card-name">Digital</span>
+        <span class="pricing-card-price">R$ 29</span>
+        <ul class="pricing-card-features">
+          <li>Alta resolucao</li>
+          <li>Sem marca d'agua</li>
+          <li>Download imediato</li>
+          <li>Uso pessoal</li>
+        </ul>
+        <button class="pricing-btn">Selecionar</button>
+      </div>
+      <div class="pricing-card">
+        <span class="pricing-card-name">Fine Art Print</span>
+        <span class="pricing-card-price">R$ 89</span>
+        <ul class="pricing-card-features">
+          <li>Papel museum-quality</li>
+          <li>Tintas arquivais</li>
+          <li>Inclui digital</li>
+          <li>Frete gratis</li>
+        </ul>
+        <button class="pricing-btn">Selecionar</button>
+      </div>
+      <div class="pricing-card">
+        <span class="pricing-card-name">Canvas</span>
+        <span class="pricing-card-price">R$ 199</span>
+        <ul class="pricing-card-features">
+          <li>Tela premium</li>
+          <li>Pronto para pendurar</li>
+          <li>Inclui digital</li>
+          <li>Frete gratis</li>
+        </ul>
+        <button class="pricing-btn">Selecionar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span class="footer-logo">Fotofocinho</span>
+    <div class="footer-links">
+      <a href="#" class="footer-link">Termos</a>
+      <a href="#" class="footer-link">Privacidade</a>
+      <a href="#" class="footer-link">Contato</a>
+    </div>
+    <span class="footer-copy">&copy; 2025</span>
+  </footer>
+</body>
+</html>

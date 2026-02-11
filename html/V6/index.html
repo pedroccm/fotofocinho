@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Retratos de Pet com IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --yellow: #FFEB3B;
+      --cream: #FFFDE7;
+      --pink: #FF6B9D;
+      --green: #00E676;
+      --blue: #536DFE;
+      --black: #1A1A1A;
+      --white: #FFFFFF;
+      --border: 3px solid var(--black);
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--cream);
+      color: var(--black);
+      overflow-x: hidden;
+    }
+
+    /* Navigation - Top Bar */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: var(--yellow);
+      border-bottom: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 28px;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--black);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--black);
+      border: var(--border);
+      background: var(--white);
+      transition: all 0.1s;
+    }
+
+    .nav-link:hover {
+      background: var(--black);
+      color: var(--white);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--black);
+    }
+
+    .nav-link.primary {
+      background: var(--pink);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      padding: 120px 32px 64px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-content {
+      max-width: 600px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: var(--green);
+      border: var(--border);
+      margin-bottom: 24px;
+      transform: rotate(-2deg);
+    }
+
+    .hero h1 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 72px;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span {
+      display: block;
+      color: var(--pink);
+      -webkit-text-stroke: 2px var(--black);
+    }
+
+    .hero p {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 450px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: var(--border);
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--pink);
+      color: var(--black);
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .btn-secondary:hover {
+      background: var(--yellow);
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      position: relative;
+    }
+
+    .hero-cards {
+      position: relative;
+      width: 100%;
+      height: 500px;
+    }
+
+    .hero-card {
+      position: absolute;
+      width: 280px;
+      height: 350px;
+      background: var(--white);
+      border: var(--border);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-card:nth-child(1) {
+      top: 0;
+      left: 0;
+      background: var(--pink);
+      transform: rotate(-6deg);
+      z-index: 1;
+    }
+
+    .hero-card:nth-child(2) {
+      top: 60px;
+      left: 180px;
+      background: var(--yellow);
+      transform: rotate(4deg);
+      z-index: 2;
+    }
+
+    .hero-card:nth-child(3) {
+      top: 120px;
+      left: 80px;
+      background: var(--green);
+      transform: rotate(-2deg);
+      z-index: 3;
+    }
+
+    /* Horizontal Scroll Section */
+    .scroll-section {
+      padding: 80px 0;
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .scroll-header {
+      padding: 0 32px;
+      margin-bottom: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scroll-header h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 48px;
+      text-transform: uppercase;
+    }
+
+    .scroll-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .scroll-btn {
+      width: 50px;
+      height: 50px;
+      background: var(--white);
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .scroll-btn:hover {
+      background: var(--yellow);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--white);
+    }
+
+    .scroll-track {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      padding: 0 32px 24px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-track::-webkit-scrollbar {
+      height: 12px;
+    }
+
+    .scroll-track::-webkit-scrollbar-track {
+      background: var(--black);
+      border: 2px solid var(--white);
+    }
+
+    .scroll-track::-webkit-scrollbar-thumb {
+      background: var(--yellow);
+      border: 2px solid var(--white);
+    }
+
+    .style-card {
+      flex-shrink: 0;
+      width: 300px;
+      scroll-snap-align: start;
+    }
+
+    .style-image {
+      width: 100%;
+      height: 380px;
+      border: var(--border);
+      border-color: var(--white);
+      margin-bottom: 16px;
+      transition: all 0.2s;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .style-card:hover .style-image {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--yellow);
+    }
+
+    .style-card h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 20px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .style-card p {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    /* How It Works */
+    .how-section {
+      padding: 100px 32px;
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .how-header h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 56px;
+      text-transform: uppercase;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .how-card {
+      background: var(--white);
+      border: var(--border);
+      padding: 32px;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .how-card:hover {
+      transform: translate(-6px, -6px);
+      box-shadow: 12px 12px 0 var(--black);
+    }
+
+    .how-card:nth-child(1) {
+      background: var(--pink);
+    }
+
+    .how-card:nth-child(2) {
+      background: var(--yellow);
+    }
+
+    .how-card:nth-child(3) {
+      background: var(--green);
+    }
+
+    .how-number {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 80px;
+      line-height: 1;
+      opacity: 0.3;
+      margin-bottom: 16px;
+    }
+
+    .how-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .how-card h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 24px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .how-card p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Pricing */
+    .pricing-section {
+      padding: 100px 32px;
+      background: var(--yellow);
+      border-top: var(--border);
+      border-bottom: var(--border);
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .pricing-header h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 56px;
+      text-transform: uppercase;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: var(--white);
+      border: var(--border);
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .price-card:hover {
+      transform: translate(-6px, -6px);
+      box-shadow: 12px 12px 0 var(--black);
+    }
+
+    .price-card.featured {
+      background: var(--black);
+      color: var(--white);
+      transform: scale(1.05) rotate(1deg);
+    }
+
+    .price-card.featured:hover {
+      transform: scale(1.05) rotate(1deg) translate(-6px, -6px);
+      box-shadow: 12px 12px 0 var(--pink);
+    }
+
+    .price-card h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 24px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .price-value {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .price-value small {
+      font-size: 18px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 32px 0;
+      text-align: left;
+    }
+
+    .price-card li {
+      padding: 12px 0;
+      border-bottom: 2px dashed currentColor;
+      font-size: 14px;
+    }
+
+    .price-card li::before {
+      content: '→ ';
+    }
+
+    .price-card .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .price-card.featured .btn {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 36px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .footer p {
+      font-size: 13px;
+      opacity: 0.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 48px;
+      }
+
+      .hero-visual {
+        display: none;
+      }
+
+      .how-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .price-card.featured {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="logo">Fotofocinho</a>
+    <div class="nav-links">
+      <a href="#styles" class="nav-link">Estilos</a>
+      <a href="#pricing" class="nav-link">Precos</a>
+      <a href="login.html" class="nav-link">Entrar</a>
+      <a href="register.html" class="nav-link primary">Criar conta</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">+ Novo: Pop Art</div>
+      <h1>
+        Seu pet
+        <span>como arte</span>
+      </h1>
+      <p>Transformamos a foto do seu melhor amigo em um retrato artistico brutal, criado por inteligencia artificial com estilo unico.</p>
+      <div class="hero-buttons">
+        <a href="#" class="btn btn-primary">
+          Criar agora →
+        </a>
+        <a href="#styles" class="btn btn-secondary">
+          Ver estilos
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-cards">
+        <div class="hero-card" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+        <div class="hero-card" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+        <div class="hero-card" style="background-image: url('../../samples/output/dog2/military.jpg');"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Horizontal Scroll Styles -->
+  <section class="scroll-section" id="styles">
+    <div class="scroll-header">
+      <h2>Estilos</h2>
+      <div class="scroll-nav">
+        <button class="scroll-btn">←</button>
+        <button class="scroll-btn">→</button>
+      </div>
+    </div>
+    <div class="scroll-track">
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+        <h3>Renascenca</h3>
+        <p>Classico e elegante</p>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+        <h3>Barroco</h3>
+        <p>Dramatico e rico</p>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog2/victorian.jpg');"></div>
+        <h3>Vitoriano</h3>
+        <p>Vibrante e moderno</p>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/gato1/royal.jpg');"></div>
+        <h3>Realeza</h3>
+        <p>Suave e artistico</p>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog3/military.jpg');"></div>
+        <h3>Militar</h3>
+        <p>Heroico e majestoso</p>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog4/admiral.jpg');"></div>
+        <h3>Almirante</h3>
+        <p>Organico e fluido</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-section">
+    <div class="how-header">
+      <h2>Como funciona</h2>
+    </div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-number">01</div>
+        <div class="how-icon">1</div>
+        <h3>Upload</h3>
+        <p>Envie uma foto clara do seu pet. Quanto melhor a qualidade, mais incrivel o resultado.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-number">02</div>
+        <div class="how-icon">2</div>
+        <h3>Estilo</h3>
+        <p>Escolha entre varios estilos artisticos. Do classico ao contemporaneo.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-number">03</div>
+        <div class="how-icon">3</div>
+        <h3>Pronto!</h3>
+        <p>Receba seu retrato em minutos. Baixe digital ou encomende impresso.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-header">
+      <h2>Precos</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Digital</h3>
+        <div class="price-value">R$29<small>/un</small></div>
+        <ul>
+          <li>Alta resolucao</li>
+          <li>Pronto em 5 min</li>
+          <li>Download ilimitado</li>
+          <li>Todos os estilos</li>
+        </ul>
+        <button class="btn btn-secondary">Escolher</button>
+      </div>
+      <div class="price-card featured">
+        <h3>Canvas</h3>
+        <div class="price-value">R$199<small>/un</small></div>
+        <ul>
+          <li>Impressao premium</li>
+          <li>Moldura inclusa</li>
+          <li>Frete gratis</li>
+          <li>Garantia vitalicia</li>
+        </ul>
+        <button class="btn btn-primary">Mais popular</button>
+      </div>
+      <div class="price-card">
+        <h3>Fine Art</h3>
+        <div class="price-value">R$89<small>/un</small></div>
+        <ul>
+          <li>Papel 300g</li>
+          <li>Cores vibrantes</li>
+          <li>Varios tamanhos</li>
+          <li>Envio seguro</li>
+        </ul>
+        <button class="btn btn-secondary">Escolher</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">Fotofocinho</div>
+    <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>

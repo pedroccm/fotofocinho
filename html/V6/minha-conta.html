@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --yellow: #FFEB3B;
+      --cream: #FFFDE7;
+      --pink: #FF6B9D;
+      --green: #00E676;
+      --blue: #536DFE;
+      --black: #1A1A1A;
+      --white: #FFFFFF;
+      --border: 3px solid var(--black);
+      --success: #00E676;
+      --warning: #FFEB3B;
+      --info: #536DFE;
+    }
+
+    body {
+      font-family: 'Space Mono', monospace;
+      background: var(--cream);
+      color: var(--black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: var(--yellow);
+      border-bottom: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 28px;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--black);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--black);
+      border: var(--border);
+      background: var(--white);
+      transition: all 0.1s;
+    }
+
+    .nav-link:hover {
+      background: var(--black);
+      color: var(--white);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--black);
+    }
+
+    .nav-link.danger {
+      background: var(--pink);
+    }
+
+    .nav-link.danger:hover {
+      background: #ff4b7d;
+    }
+
+    /* Main Layout */
+    .main {
+      margin-top: 70px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .page-header {
+      background: var(--pink);
+      border-bottom: var(--border);
+      padding: 48px 32px;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info h1 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 48px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .user-info p {
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: var(--border);
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--yellow);
+      color: var(--black);
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--black);
+    }
+
+    .btn-outline:hover {
+      background: var(--yellow);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--black);
+    }
+
+    .btn-sm {
+      padding: 10px 16px;
+      font-size: 12px;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 48px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: var(--border);
+      padding: 24px;
+      transition: all 0.1s;
+    }
+
+    .stat-card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    .stat-card:nth-child(1) { background: var(--yellow); }
+    .stat-card:nth-child(2) { background: var(--green); }
+    .stat-card:nth-child(3) { background: var(--pink); }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 48px;
+    }
+
+    /* Section */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 32px;
+      text-transform: uppercase;
+    }
+
+    /* Orders Grid - Bento Style */
+    .orders-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .order-card {
+      background: var(--white);
+      border: var(--border);
+      overflow: hidden;
+      transition: all 0.1s;
+    }
+
+    .order-card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    .order-card.large {
+      grid-column: span 2;
+    }
+
+    .order-thumb {
+      height: 120px;
+      background: var(--cream);
+      border-bottom: var(--border);
+      overflow: hidden;
+    }
+
+    .order-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-card:nth-child(1) .order-thumb { background: var(--pink); }
+    .order-card:nth-child(2) .order-thumb { background: var(--yellow); }
+    .order-card:nth-child(3) .order-thumb { background: var(--green); }
+
+    .order-content {
+      padding: 20px;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .order-info h3 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 18px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .order-info span {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 2px solid var(--black);
+    }
+
+    .badge-success {
+      background: var(--green);
+    }
+
+    .badge-warning {
+      background: var(--yellow);
+    }
+
+    .badge-info {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .order-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 2px dashed var(--black);
+    }
+
+    .order-date {
+      font-size: 12px;
+    }
+
+    .order-price {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 24px;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 32px;
+      text-align: center;
+      border-top: var(--border);
+    }
+
+    .footer p {
+      font-size: 13px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 900px) {
+      .header-content {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .orders-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-card.large {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="logo">Fotofocinho</a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Criar novo</a>
+      <a href="login.html" class="nav-link danger">Sair</a>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-content">
+        <div class="user-info">
+          <h1>Ola, Pedro!</h1>
+          <p>pedro@email.com</p>
+        </div>
+        <a href="index.html" class="btn btn-primary">
+          + Novo retrato
+        </a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total de pedidos</div>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Retratos criados</div>
+          <div class="stat-value">5</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total gasto</div>
+          <div class="stat-value">R$317</div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div class="section-header">
+        <h2 class="section-title">Meus pedidos</h2>
+      </div>
+
+      <div class="orders-grid">
+        <!-- Order 1 - Large -->
+        <div class="order-card large">
+          <div class="order-thumb"><img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait"></div>
+          <div class="order-content">
+            <div class="order-header">
+              <div class="order-info">
+                <h3>Canvas 40x60cm</h3>
+                <span>Estilo Renascenca</span>
+              </div>
+              <span class="badge badge-success">Pago</span>
+            </div>
+            <div class="order-meta">
+              <span class="order-date">15 jan. 2025</span>
+              <span class="order-price">R$199</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn btn-outline btn-sm">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order 2 -->
+        <div class="order-card">
+          <div class="order-thumb"><img src="../../samples/output/gato/baroque.jpg" alt="Portrait"></div>
+          <div class="order-content">
+            <div class="order-header">
+              <div class="order-info">
+                <h3>Fine Art 30x40cm</h3>
+                <span>Estilo Barroco</span>
+              </div>
+              <span class="badge badge-info">Enviado</span>
+            </div>
+            <div class="order-meta">
+              <span class="order-date">10 jan. 2025</span>
+              <span class="order-price">R$89</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn btn-outline btn-sm">Rastrear</button>
+              <button class="btn btn-outline btn-sm">Download</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order 3 -->
+        <div class="order-card">
+          <div class="order-thumb"><img src="../../samples/output/dog2/military.jpg" alt="Portrait"></div>
+          <div class="order-content">
+            <div class="order-header">
+              <div class="order-info">
+                <h3>Digital</h3>
+                <span>Estilo Militar</span>
+              </div>
+              <span class="badge badge-warning">Aguardando</span>
+            </div>
+            <div class="order-meta">
+              <span class="order-date">18 jan. 2025</span>
+              <span class="order-price">R$29</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn btn-primary btn-sm">Pagar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #0c0c0c;
+      --white: #fafafa;
+      --gold: #b8956e;
+      --gray: #888;
+      --gray-dark: #333;
+      --gray-light: #e5e5e5;
+      --red: #c44;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-weight: 300;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Left Panel - Form */
+    .form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      order: 1;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .form-header {
+      margin-bottom: 48px;
+    }
+
+    .form-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 32px;
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .form-subtitle {
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray-dark);
+      margin-bottom: 12px;
+    }
+
+    .form-input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 300;
+      border: none;
+      border-bottom: 1px solid var(--gray-light);
+      background: transparent;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-input:focus {
+      border-color: var(--black);
+    }
+
+    .form-input::placeholder {
+      color: var(--gray);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray);
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.3s;
+    }
+
+    .password-toggle:hover {
+      color: var(--black);
+    }
+
+    .form-error {
+      padding: 16px;
+      background: rgba(204, 68, 68, 0.05);
+      border-left: 2px solid var(--red);
+      color: var(--red);
+      font-size: 13px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 18px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .form-submit:hover {
+      background: var(--gold);
+    }
+
+    .form-footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .form-footer a {
+      color: var(--black);
+      border-bottom: 1px solid var(--gray-light);
+      transition: border-color 0.3s;
+    }
+
+    .form-footer a:hover {
+      border-color: var(--black);
+    }
+
+    .back-link {
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    .back-link a {
+      font-size: 12px;
+      color: var(--gray);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s;
+    }
+
+    .back-link a:hover {
+      color: var(--black);
+    }
+
+    /* Right Panel - Branding */
+    .brand-panel {
+      background: var(--black);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+      order: 2;
+    }
+
+    .brand-panel::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(184, 149, 110, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .brand-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+      position: relative;
+      z-index: 1;
+      text-align: right;
+    }
+
+    .brand-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(48px, 6vw, 72px);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .brand-text {
+      color: var(--gray);
+      max-width: 300px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .brand-footer {
+      font-size: 11px;
+      color: var(--gray);
+      position: relative;
+      z-index: 1;
+      text-align: right;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-panel {
+        display: none;
+      }
+
+      .form-panel {
+        min-height: 100vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Form Panel -->
+  <div class="form-panel">
+    <div class="form-container">
+      <div class="form-header">
+        <h2 class="form-title">Criar Conta</h2>
+        <p class="form-subtitle">Preencha os dados para comecar</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <div class="form-input-wrapper">
+            <input type="text" class="form-input" placeholder="Seu nome" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="form-input-wrapper">
+            <input type="email" class="form-input" placeholder="seu@email.com" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="password" placeholder="Minimo 6 caracteres" minlength="6" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('password', 'eyeIcon1')">
+              <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar Senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="confirmPassword" placeholder="Digite novamente" minlength="6" required>
+            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'eyeIcon2')">
+              <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-error" id="errorBox">
+          As senhas nao coincidem. Tente novamente.
+        </div>
+
+        <button type="submit" class="form-submit">Criar Conta</button>
+      </form>
+
+      <p class="form-footer">
+        Ja tem uma conta? <a href="login.html">Entrar</a>
+      </p>
+
+      <div class="back-link">
+        <a href="index.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Voltar ao inicio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Panel -->
+  <div class="brand-panel">
+    <a href="index.html" class="brand-logo">Fotofocinho</a>
+    <div class="brand-content">
+      <h1 class="brand-title">Junte-se<br>a nos</h1>
+      <p class="brand-text">
+        Crie sua conta gratuita e comece a transformar
+        as fotos do seu pet em verdadeiras obras de arte.
+      </p>
+    </div>
+    <p class="brand-footer">&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </div>
+
+  <script>
+    const passwordVisibility = {
+      password: false,
+      confirmPassword: false
+    };
+
+    function togglePassword(inputId, iconId) {
+      passwordVisibility[inputId] = !passwordVisibility[inputId];
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+
+      input.type = passwordVisibility[inputId] ? 'text' : 'password';
+
+      if (passwordVisibility[inputId]) {
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        `;
+      } else {
+        icon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorBox = document.getElementById('errorBox');
+
+      if (password !== confirmPassword) {
+        errorBox.classList.add('visible');
+        return;
+      }
+
+      errorBox.classList.remove('visible');
+      window.location.href = 'minha-conta.html';
+    });
+  </script>
+</body>
+</html>

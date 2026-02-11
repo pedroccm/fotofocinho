@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #0c0c0c;
+      --white: #fafafa;
+      --gold: #b8956e;
+      --gray: #888;
+      --gray-dark: #333;
+      --gray-light: #e5e5e5;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+      font-weight: 300;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navigation */
+    .nav {
+      border-bottom: 1px solid var(--gray-light);
+      padding: 0 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
+    }
+
+    .nav-logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      color: var(--gray);
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: var(--black);
+    }
+
+    .nav-link.logout:hover {
+      color: #c44;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: var(--black);
+      color: var(--white);
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-info {
+      margin-bottom: 48px;
+    }
+
+    .user-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #d4b896);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .user-name {
+      font-family: 'Instrument Serif', serif;
+      font-size: 20px;
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .sidebar-nav {
+      list-style: none;
+    }
+
+    .sidebar-nav-item {
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-nav-link {
+      font-size: 13px;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: color 0.3s;
+    }
+
+    .sidebar-nav-link:hover,
+    .sidebar-nav-link.active {
+      color: var(--white);
+    }
+
+    .sidebar-nav-link.active::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .stat-value {
+      font-family: 'Instrument Serif', serif;
+      font-size: 32px;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    /* Content Area */
+    .content {
+      padding: 48px;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .content-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .btn-new {
+      padding: 12px 24px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-new:hover {
+      background: var(--gold);
+    }
+
+    /* Orders Table */
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .orders-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-light);
+    }
+
+    .orders-table td {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--gray-light);
+      vertical-align: middle;
+    }
+
+    .order-product {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .order-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .order-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-info h4 {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .order-info span {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .order-status {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+
+    .status-paid {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+    }
+
+    .status-pending {
+      background: rgba(234, 179, 8, 0.1);
+      color: #b45309;
+    }
+
+    .status-shipped {
+      background: rgba(99, 102, 241, 0.1);
+      color: #4f46e5;
+    }
+
+    .order-price {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      padding: 8px 16px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 1px solid var(--gray-light);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-action:hover {
+      border-color: var(--black);
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-action.primary {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--white);
+    }
+
+    .btn-action.primary:hover {
+      background: var(--black);
+      border-color: var(--black);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+      border: 1px dashed var(--gray-light);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 24px;
+    }
+
+    .empty-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 24px;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 32px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 24px 48px;
+      border-top: 1px solid var(--gray-light);
+      text-align: center;
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .nav {
+        padding: 0 24px;
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .orders-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">Fotofocinho</a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Criar Novo</a>
+      <a href="login.html" class="nav-link logout">Sair</a>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="user-info">
+        <div class="user-avatar">P</div>
+        <h3 class="user-name">Pedro</h3>
+        <p class="user-email">pedro@email.com</p>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-item">
+          <a href="#" class="sidebar-nav-link active">Meus Pedidos</a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="#" class="sidebar-nav-link">Meus Dados</a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="#" class="sidebar-nav-link">Enderecos</a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-stats">
+          <div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Pedidos</div>
+          </div>
+          <div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Retratos</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="content-header">
+        <h1 class="content-title">Meus Pedidos</h1>
+        <a href="index.html" class="btn-new">+ Novo Retrato</a>
+      </div>
+
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th>Valor</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="order-product">
+                <div class="order-thumb"><img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait"></div>
+                <div class="order-info">
+                  <h4>Quadro Canvas 40x60cm</h4>
+                  <span>Estilo Renascenca</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="order-status status-paid">Pago</span></td>
+            <td>15 jan. 2025</td>
+            <td><span class="order-price">R$ 199</span></td>
+            <td>
+              <div class="order-actions">
+                <button class="btn-action primary">Download</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="order-product">
+                <div class="order-thumb"><img src="../../samples/output/gato/baroque.jpg" alt="Portrait"></div>
+                <div class="order-info">
+                  <h4>Fine Art Print 30x40cm</h4>
+                  <span>Estilo Barroco</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="order-status status-shipped">Enviado</span></td>
+            <td>10 jan. 2025</td>
+            <td><span class="order-price">R$ 89</span></td>
+            <td>
+              <div class="order-actions">
+                <button class="btn-action">Rastrear</button>
+                <button class="btn-action primary">Download</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="order-product">
+                <div class="order-thumb"><img src="../../samples/output/dog2/military.jpg" alt="Portrait"></div>
+                <div class="order-info">
+                  <h4>Download Digital</h4>
+                  <span>Estilo Militar</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="order-status status-pending">Aguardando</span></td>
+            <td>18 jan. 2025</td>
+            <td><span class="order-price">R$ 29</span></td>
+            <td>
+              <div class="order-actions">
+                <button class="btn-action">Pagar</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State (hidden) -->
+      <!--
+      <div class="empty-state">
+        <div class="empty-icon" style="color: var(--gray);">—</div>
+        <h3 class="empty-title">Nenhum pedido ainda</h3>
+        <p class="empty-text">Crie seu primeiro retrato e veja aqui</p>
+        <a href="index.html" class="btn-new">Criar Retrato</a>
+      </div>
+      -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    &copy; 2025 Fotofocinho. Todos os direitos reservados.
+  </footer>
+</body>
+</html>

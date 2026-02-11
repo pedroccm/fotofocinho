@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --sage: #9CAF88;
+      --sage-dark: #7A8F6C;
+      --terracotta: #C17F59;
+      --terracotta-dark: #A66B47;
+      --sand: #F5F0E8;
+      --cream: #FFFDF9;
+      --earth: #5C4B3A;
+      --text: #3D3229;
+      --text-muted: #8B7E72;
+      --success: #6B9B5B;
+      --error: #C75050;
+    }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--sand);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .blob {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: var(--sage);
+      opacity: 0.2;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      top: -100px;
+      right: -100px;
+      z-index: 0;
+    }
+    .nav {
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+    }
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--earth);
+      text-decoration: none;
+    }
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--text); }
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-container { width: 100%; max-width: 420px; }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 8px;
+    }
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .auth-card {
+      background: var(--cream);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    }
+    .form-group { margin-bottom: 24px; }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--sand);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--sage);
+      background: white;
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .form-input.success { border-color: var(--success); }
+    .form-input.error { border-color: var(--error); }
+    .input-wrapper { position: relative; }
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+    }
+    .toggle-password:hover { color: var(--text); }
+    .password-strength {
+      margin-top: 8px;
+      height: 6px;
+      background: var(--sand);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s;
+      border-radius: 3px;
+    }
+    .password-hint {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .password-match {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    .password-match.success { color: var(--success); }
+    .password-match.error { color: var(--error); }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 24px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--terracotta);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--terracotta-dark);
+    }
+    .terms {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .terms a {
+      color: var(--terracotta);
+      text-decoration: none;
+    }
+    .terms a:hover { text-decoration: underline; }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--sand);
+    }
+    .divider-text {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .auth-footer {
+      text-align: center;
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .auth-footer a {
+      color: var(--terracotta);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+    .footer {
+      padding: 24px 48px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="blob"></div>
+  <nav class="nav">
+    <a href="index.html" class="logo">fotofocinho</a>
+    <a href="login.html" class="nav-link">Ja tenho conta</a>
+  </nav>
+  <main class="main">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Crie sua conta</h1>
+        <p>Comece a criar retratos incriveis</p>
+      </div>
+      <div class="auth-card">
+        <form>
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-input" placeholder="Seu nome">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="password" placeholder="Crie uma senha" oninput="checkPassword()">
+              <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-1">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="password-strength">
+              <div class="password-strength-bar" id="strength-bar"></div>
+            </div>
+            <p class="password-hint">Minimo 8 caracteres</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar senha</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="confirm-password" placeholder="Confirme" oninput="checkPasswordMatch()">
+              <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="password-match" id="password-match"></div>
+          </div>
+          <button type="submit" class="btn btn-primary">Criar conta</button>
+          <p class="terms">
+            Ao criar conta, voce concorda com os<br>
+            <a href="#">Termos</a> e <a href="#">Privacidade</a>
+          </p>
+        </form>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">ou</span>
+          <div class="divider-line"></div>
+        </div>
+        <div class="auth-footer">
+          Ja tem conta? <a href="login.html">Entrar</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2025 Fotofocinho. Feito com amor.</p>
+  </footer>
+  <script>
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const iconId = inputId === 'password' ? 'eye-icon-1' : 'eye-icon-2';
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+    function checkPassword() {
+      const password = document.getElementById('password').value;
+      const bar = document.getElementById('strength-bar');
+      let strength = 0;
+      if (password.length >= 8) strength += 25;
+      if (password.match(/[a-z]/)) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      bar.style.width = strength + '%';
+      if (strength <= 25) bar.style.background = '#C75050';
+      else if (strength <= 50) bar.style.background = '#C17F59';
+      else if (strength <= 75) bar.style.background = '#9CAF88';
+      else bar.style.background = '#6B9B5B';
+      checkPasswordMatch();
+    }
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm-password').value;
+      const matchDiv = document.getElementById('password-match');
+      const confirmInput = document.getElementById('confirm-password');
+      if (confirm === '') {
+        matchDiv.innerHTML = '';
+        confirmInput.classList.remove('success', 'error');
+        return;
+      }
+      if (password === confirm) {
+        matchDiv.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Senhas coincidem';
+        matchDiv.className = 'password-match success';
+        confirmInput.classList.remove('error');
+        confirmInput.classList.add('success');
+      } else {
+        matchDiv.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Senhas nao coincidem';
+        matchDiv.className = 'password-match error';
+        confirmInput.classList.remove('success');
+        confirmInput.classList.add('error');
+      }
+    }
+  </script>
+</body>
+</html>

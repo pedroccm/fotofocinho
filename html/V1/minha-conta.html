@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0 24px;
+    }
+
+    .navbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-size: 8px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #c9a96e;
+    }
+
+    .nav-link.logout:hover {
+      color: #f87171;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      width: 100%;
+    }
+
+    /* Header */
+    .page-header {
+      margin-bottom: 40px;
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-email {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Orders Section */
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title-text {
+      color: #c9a96e;
+    }
+
+    .section-title-count {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 48px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 24px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(to bottom right, #c9a96e, #dfc08a);
+      color: #0a0a0a;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Order Cards */
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .order-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .order-thumbnail {
+      width: 96px;
+      height: 96px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .order-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-thumbnail-placeholder {
+      font-size: 32px;
+    }
+
+    .order-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .order-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .order-product {
+      font-weight: 500;
+    }
+
+    .order-size {
+      color: rgba(255, 255, 255, 0.5);
+      margin-left: 8px;
+    }
+
+    .order-style {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .order-status {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .status-pending {
+      background: rgba(234, 179, 8, 0.2);
+      color: #facc15;
+    }
+
+    .status-paid {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .status-processing {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+
+    .status-shipped {
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+    }
+
+    .status-delivered {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .order-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 12px;
+    }
+
+    .order-price {
+      font-weight: 500;
+      color: white;
+    }
+
+    .order-tracking {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 12px;
+    }
+
+    .order-tracking code {
+      color: white;
+      font-family: monospace;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-download {
+      padding: 8px 16px;
+      background: rgba(201, 169, 110, 0.2);
+      color: #c9a96e;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .btn-download:hover {
+      background: rgba(201, 169, 110, 0.3);
+    }
+
+    .payment-hint {
+      padding: 8px 16px;
+      color: rgba(250, 204, 21, 0.7);
+      font-size: 14px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 24px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .footer-copyright {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .order-card {
+        flex-direction: column;
+      }
+
+      .order-thumbnail {
+        width: 100%;
+        height: 200px;
+      }
+
+      .order-header {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-text">Fotofocinho</span>
+        <span class="logo-sub">PET PORTRAITS</span>
+      </a>
+
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link">Criar Novo</a>
+        <a href="login.html" class="nav-link logout">Sair</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="page-title">Ola, Pedro!</h1>
+      <p class="page-email">pedro@email.com</p>
+    </div>
+
+    <!-- Orders -->
+    <section>
+      <h2 class="section-title">
+        <span class="section-title-text">Meus Pedidos</span>
+        <span class="section-title-count">(3)</span>
+      </h2>
+
+      <!-- Orders List -->
+      <div class="orders-list">
+        <!-- Order 1 - Paid -->
+        <div class="order-card">
+          <div class="order-thumbnail">
+            <img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait">
+          </div>
+          <div class="order-details">
+            <div class="order-header">
+              <div>
+                <h3 class="order-product">
+                  Quadro Canvas
+                  <span class="order-size">(40x60cm)</span>
+                </h3>
+                <p class="order-style">Estilo Renascenca</p>
+              </div>
+              <span class="order-status status-paid">Pago</span>
+            </div>
+            <div class="order-meta">
+              <span>15 jan. 2025</span>
+              <span>-</span>
+              <span class="order-price">R$ 199,00</span>
+            </div>
+            <div class="order-actions">
+              <a href="#" class="btn-download">Download HD</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order 2 - Shipped -->
+        <div class="order-card">
+          <div class="order-thumbnail">
+            <img src="../../samples/output/gato/baroque.jpg" alt="Portrait">
+          </div>
+          <div class="order-details">
+            <div class="order-header">
+              <div>
+                <h3 class="order-product">
+                  Fine Art Print
+                  <span class="order-size">(30x40cm)</span>
+                </h3>
+                <p class="order-style">Estilo Barroco</p>
+              </div>
+              <span class="order-status status-shipped">Enviado</span>
+            </div>
+            <div class="order-meta">
+              <span>10 jan. 2025</span>
+              <span>-</span>
+              <span class="order-price">R$ 89,00</span>
+            </div>
+            <p class="order-tracking">
+              Rastreio: <code>BR123456789</code>
+            </p>
+            <div class="order-actions">
+              <a href="#" class="btn-download">Download HD</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order 3 - Pending Payment -->
+        <div class="order-card">
+          <div class="order-thumbnail">
+            <img src="../../samples/output/dog2/military.jpg" alt="Portrait">
+          </div>
+          <div class="order-details">
+            <div class="order-header">
+              <div>
+                <h3 class="order-product">
+                  Download Digital
+                </h3>
+                <p class="order-style">Estilo Militar</p>
+              </div>
+              <span class="order-status status-pending">Aguardando Pagamento</span>
+            </div>
+            <div class="order-meta">
+              <span>18 jan. 2025</span>
+              <span>-</span>
+              <span class="order-price">R$ 29,00</span>
+            </div>
+            <div class="order-actions">
+              <span class="payment-hint">Complete o pagamento para baixar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State (hidden by default, shown when no orders) -->
+      <!--
+      <div class="empty-state">
+        <div class="empty-icon" style="font-size: 48px; color: rgba(201, 169, 110, 0.5);">—</div>
+        <h3 class="empty-title">Nenhum pedido ainda</h3>
+        <p class="empty-text">Crie seu primeiro retrato e veja aqui!</p>
+        <a href="index.html" class="btn-primary">Criar Retrato</a>
+      </div>
+      -->
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p class="footer-copyright">&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+</body>
+</html>

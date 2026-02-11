@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Comparador de Versoes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      background: #111;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      flex-shrink: 0;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ff6b9d;
+    }
+
+    .version-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .version-tab {
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .version-tab:hover {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+    }
+
+    .version-tab.active {
+      background: white;
+      color: #0a0a0a;
+      border-color: white;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-selector label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .page-selector select {
+      padding: 8px 32px 8px 12px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .page-selector select:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .device-toggle {
+      display: flex;
+      gap: 4px;
+    }
+
+    .device-btn {
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .device-btn:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .device-btn.active {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .preview-area {
+      flex: 1;
+      background: #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .preview-container {
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+    }
+
+    .preview-container.mobile {
+      width: 375px;
+      height: 100%;
+      max-height: 812px;
+    }
+
+    .preview-container.tablet {
+      width: 768px;
+      height: 100%;
+      max-height: 1024px;
+    }
+
+    .preview-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    @media (max-width: 1200px) {
+      .version-tabs {
+        display: none;
+      }
+
+      .topbar-left {
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 16px;
+        gap: 16px;
+      }
+
+      .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .preview-container.mobile,
+      .preview-container.tablet {
+        width: 100%;
+        max-height: none;
+      }
+    }
+
+    /* Version selector for mobile */
+    .version-select {
+      display: none;
+      padding: 8px 32px 8px 12px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    @media (max-width: 1200px) {
+      .version-select {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="logo">Fotofocinho UI</span>
+
+      <div class="version-tabs">
+        <button class="version-tab active" data-version="V1">V1</button>
+        <button class="version-tab" data-version="V2">V2</button>
+        <button class="version-tab" data-version="V3">V3</button>
+        <button class="version-tab" data-version="V4">V4</button>
+        <button class="version-tab" data-version="V5">V5</button>
+        <button class="version-tab" data-version="V6">V6</button>
+        <button class="version-tab" data-version="V7">V7</button>
+        <button class="version-tab" data-version="V8">V8</button>
+        <button class="version-tab" data-version="V9">V9</button>
+        <button class="version-tab" data-version="V10">V10</button>
+      </div>
+
+      <select class="version-select" id="versionSelect">
+        <option value="V1">V1</option>
+        <option value="V2">V2</option>
+        <option value="V3">V3</option>
+        <option value="V4">V4</option>
+        <option value="V5">V5</option>
+        <option value="V6">V6</option>
+        <option value="V7">V7</option>
+        <option value="V8">V8</option>
+        <option value="V9">V9</option>
+        <option value="V10">V10</option>
+      </select>
+    </div>
+
+    <div class="topbar-right">
+      <div class="page-selector">
+        <label>Pagina:</label>
+        <select id="pageSelect">
+          <option value="index.html">Home</option>
+          <option value="login.html">Login</option>
+          <option value="register.html">Cadastro</option>
+          <option value="minha-conta.html">Minha Conta</option>
+        </select>
+      </div>
+
+      <div class="device-toggle">
+        <button class="device-btn active" data-device="desktop" title="Desktop">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </button>
+        <button class="device-btn" data-device="tablet" title="Tablet">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="20" rx="2"/>
+            <line x1="12" y1="18" x2="12" y2="18"/>
+          </svg>
+        </button>
+        <button class="device-btn" data-device="mobile" title="Mobile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="2" width="14" height="20" rx="2"/>
+            <line x1="12" y1="18" x2="12" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="preview-area">
+    <div class="preview-container" id="previewContainer">
+      <iframe id="previewFrame" src="V1/index.html"></iframe>
+    </div>
+  </main>
+
+  <script>
+    let currentVersion = 'V1';
+    let currentPage = 'index.html';
+    let currentDevice = 'desktop';
+
+    // Version tabs
+    document.querySelectorAll('.version-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.version-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentVersion = tab.dataset.version;
+        document.getElementById('versionSelect').value = currentVersion;
+        updatePreview();
+      });
+    });
+
+    // Version select (mobile)
+    document.getElementById('versionSelect').addEventListener('change', (e) => {
+      currentVersion = e.target.value;
+      document.querySelectorAll('.version-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.version === currentVersion);
+      });
+      updatePreview();
+    });
+
+    // Page selector
+    document.getElementById('pageSelect').addEventListener('change', (e) => {
+      currentPage = e.target.value;
+      updatePreview();
+    });
+
+    // Device toggle
+    document.querySelectorAll('.device-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentDevice = btn.dataset.device;
+        updateDevice();
+      });
+    });
+
+    function updatePreview() {
+      const frame = document.getElementById('previewFrame');
+      frame.src = `${currentVersion}/${currentPage}`;
+    }
+
+    function updateDevice() {
+      const container = document.getElementById('previewContainer');
+      container.className = 'preview-container ' + (currentDevice !== 'desktop' ? currentDevice : '');
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '1' && e.key <= '9') {
+        selectVersion('V' + e.key);
+      }
+      if (e.key === '0') {
+        selectVersion('V10');
+      }
+    });
+
+    function selectVersion(version) {
+      document.querySelectorAll('.version-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.version === version);
+      });
+      document.getElementById('versionSelect').value = version;
+      currentVersion = version;
+      updatePreview();
+    }
+  </script>
+</body>
+</html>

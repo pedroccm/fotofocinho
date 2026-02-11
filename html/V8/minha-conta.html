@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --white: #FFFFFF;
+      --ivory: #FDFCFA;
+      --cream: #F8F6F3;
+      --gold: #C9A962;
+      --gold-dark: #A68B4B;
+      --gold-light: #E8DCC8;
+      --charcoal: #2C2C2C;
+      --text: #1A1A1A;
+      --text-muted: #6B6B6B;
+      --border: #E8E4DE;
+      --success: #28A745;
+      --warning: #FFC107;
+      --info: #17A2B8;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--ivory);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--cream);
+    }
+
+    .nav-link.primary {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .nav-link.primary:hover {
+      background: var(--text);
+    }
+
+    .nav-link.danger:hover {
+      color: #DC3545;
+    }
+
+    /* Main */
+    .main {
+      margin-top: 72px;
+      flex: 1;
+      padding: 48px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .user-info h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+
+    .user-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--text);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--charcoal);
+      background: var(--cream);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+    }
+
+    .btn-sm {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    /* Section */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    /* Orders */
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .order-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 80px 1fr auto auto auto auto;
+      align-items: center;
+      gap: 24px;
+      transition: all 0.2s;
+    }
+
+    .order-card:hover {
+      border-color: var(--gold-light);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .order-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .order-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .order-info h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .order-info span {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .order-date {
+      text-align: center;
+    }
+
+    .order-date-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .order-date-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .order-price {
+      text-align: center;
+    }
+
+    .order-price-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .order-price-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 100px;
+    }
+
+    .badge-success {
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(255, 193, 7, 0.15);
+      color: #B8860B;
+    }
+
+    .badge-info {
+      background: rgba(23, 162, 184, 0.1);
+      color: var(--info);
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 24px 48px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .order-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 16px;
+      }
+
+      .order-thumb {
+        margin: 0 auto;
+      }
+
+      .order-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Fotofocinho</a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link primary">Criar novo</a>
+        <a href="login.html" class="nav-link danger">Sair</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="container">
+      <!-- Header -->
+      <div class="page-header">
+        <div class="user-info">
+          <h1>Ola, Pedro</h1>
+          <p>pedro@email.com</p>
+        </div>
+        <a href="index.html" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Novo retrato
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total de pedidos</h3>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat-card">
+          <h3>Retratos criados</h3>
+          <div class="stat-value">5</div>
+        </div>
+        <div class="stat-card">
+          <h3>Total investido</h3>
+          <div class="stat-value">R$317</div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div class="section-header">
+        <h2 class="section-title">Meus pedidos</h2>
+      </div>
+
+      <div class="orders-list">
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Canvas Premium 40x60cm</h4>
+            <span>Estilo Renascenca</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">15 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$199</div>
+          </div>
+          <span class="badge badge-success">Pago</span>
+          <div class="order-actions">
+            <button class="btn btn-outline btn-sm">Download</button>
+          </div>
+        </div>
+
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/gato/baroque.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Fine Art 30x40cm</h4>
+            <span>Estilo Barroco</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">10 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$89</div>
+          </div>
+          <span class="badge badge-info">Enviado</span>
+          <div class="order-actions">
+            <button class="btn btn-outline btn-sm">Rastrear</button>
+            <button class="btn btn-outline btn-sm">Download</button>
+          </div>
+        </div>
+
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/dog2/royal.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Digital</h4>
+            <span>Estilo Real</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">18 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$29</div>
+          </div>
+          <span class="badge badge-warning">Aguardando</span>
+          <div class="order-actions">
+            <button class="btn btn-gold btn-sm">Pagar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>

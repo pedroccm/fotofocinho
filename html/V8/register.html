@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --white: #FFFFFF;
+      --ivory: #FDFCFA;
+      --cream: #F8F6F3;
+      --gold: #C9A962;
+      --gold-dark: #A68B4B;
+      --gold-light: #E8DCC8;
+      --charcoal: #2C2C2C;
+      --text: #1A1A1A;
+      --text-muted: #6B6B6B;
+      --border: #E8E4DE;
+      --error: #DC3545;
+      --success: #28A745;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--ivory);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Navigation */
+    .nav {
+      height: 72px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--cream);
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .auth-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+
+    .auth-header p {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .auth-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--ivory);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-input.error {
+      border-color: var(--error);
+    }
+
+    .form-input.success {
+      border-color: var(--success);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+    }
+
+    .toggle-password:hover {
+      color: var(--text);
+    }
+
+    .password-strength {
+      margin-top: 8px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+
+    .password-hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .password-match {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .password-match.success {
+      color: var(--success);
+    }
+
+    .password-match.error {
+      color: var(--error);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--text);
+    }
+
+    .btn-primary:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+    }
+
+    .terms {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .terms a {
+      color: var(--gold-dark);
+      text-decoration: none;
+    }
+
+    .terms a:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .auth-footer a {
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 24px 48px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Fotofocinho</a>
+      <a href="login.html" class="nav-link">Ja tenho conta</a>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Crie sua conta</h1>
+        <p>Comece a transformar seu pet em realeza</p>
+      </div>
+
+      <div class="auth-card">
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-input" placeholder="Seu nome">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="seu@email.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="password" placeholder="Crie uma senha" oninput="checkPassword()">
+              <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-1">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="password-strength">
+              <div class="password-strength-bar" id="strength-bar"></div>
+            </div>
+            <p class="password-hint">Minimo 8 caracteres</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirmar senha</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="confirm-password" placeholder="Confirme sua senha" oninput="checkPasswordMatch()">
+              <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon-2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <div class="password-match" id="password-match"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Criar conta</button>
+
+          <p class="terms">
+            Ao criar uma conta, voce concorda com nossos<br>
+            <a href="#">Termos de Servico</a> e <a href="#">Politica de Privacidade</a>
+          </p>
+        </form>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">ou</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="auth-footer">
+          Ja tem uma conta? <a href="login.html">Entrar</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </footer>
+
+  <script>
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const iconId = inputId === 'password' ? 'eye-icon-1' : 'eye-icon-2';
+      const icon = document.getElementById(iconId);
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+
+    function checkPassword() {
+      const password = document.getElementById('password').value;
+      const bar = document.getElementById('strength-bar');
+      let strength = 0;
+
+      if (password.length >= 8) strength += 25;
+      if (password.match(/[a-z]/)) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+
+      bar.style.width = strength + '%';
+
+      if (strength <= 25) {
+        bar.style.background = '#DC3545';
+      } else if (strength <= 50) {
+        bar.style.background = '#FFC107';
+      } else if (strength <= 75) {
+        bar.style.background = '#C9A962';
+      } else {
+        bar.style.background = '#28A745';
+      }
+
+      checkPasswordMatch();
+    }
+
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm-password').value;
+      const matchDiv = document.getElementById('password-match');
+      const confirmInput = document.getElementById('confirm-password');
+
+      if (confirm === '') {
+        matchDiv.innerHTML = '';
+        confirmInput.classList.remove('success', 'error');
+        return;
+      }
+
+      if (password === confirm) {
+        matchDiv.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Senhas coincidem';
+        matchDiv.className = 'password-match success';
+        confirmInput.classList.remove('error');
+        confirmInput.classList.add('success');
+      } else {
+        matchDiv.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Senhas nao coincidem';
+        matchDiv.className = 'password-match error';
+        confirmInput.classList.remove('success');
+        confirmInput.classList.add('error');
+      }
+    }
+  </script>
+</body>
+</html>

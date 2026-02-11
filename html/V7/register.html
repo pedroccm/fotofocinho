@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --gradient-1: #667eea;
+      --gradient-2: #764ba2;
+      --gradient-3: #f093fb;
+      --white: #ffffff;
+      --white-90: rgba(255, 255, 255, 0.9);
+      --white-70: rgba(255, 255, 255, 0.7);
+      --white-50: rgba(255, 255, 255, 0.5);
+      --white-20: rgba(255, 255, 255, 0.2);
+      --text: #1a1a2e;
+      --text-muted: #4a4a6a;
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --error: #ef4444;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 50%, #f093fb 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: var(--text);
+    }
+
+    /* Animated Background */
+    .bg-shapes {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: float 25s ease-in-out infinite;
+    }
+
+    .bg-shape-1 {
+      width: 600px;
+      height: 600px;
+      background: #667eea;
+      top: -200px;
+      left: -200px;
+    }
+
+    .bg-shape-2 {
+      width: 500px;
+      height: 500px;
+      background: #f093fb;
+      bottom: -150px;
+      right: -150px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .logo {
+      display: block;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--white);
+      text-decoration: none;
+      margin-bottom: 32px;
+    }
+
+    /* Card */
+    .card {
+      padding: 48px 40px;
+    }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .card-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .card-header p {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* Stats */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3));
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      color: var(--white);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-input-wrapper {
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 15px;
+      background: var(--white);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .form-input:focus {
+      border-color: var(--gradient-1);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: var(--gradient-1);
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .form-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--error);
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .form-error.visible {
+      display: block;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 32px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, var(--gradient-1), var(--gradient-3));
+      color: var(--white);
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .terms {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    .terms a {
+      color: var(--gradient-1);
+      text-decoration: none;
+    }
+
+    .terms a:hover {
+      text-decoration: underline;
+    }
+
+    .card-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .card-footer a {
+      color: var(--gradient-1);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--white-90);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--white);
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 32px 24px;
+      }
+
+      .stats-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="bg-shapes">
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+  </div>
+
+  <div class="container">
+    <a href="index.html" class="logo">fotofocinho</a>
+
+    <div class="card glass">
+      <div class="card-header">
+        <h1>Criar conta</h1>
+        <p>Comece a criar retratos incriveis</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value">10K+</div>
+          <div class="stat-label">Pets transformados</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">15</div>
+          <div class="stat-label">Estilos unicos</div>
+        </div>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input type="text" class="form-input" placeholder="Seu nome" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="seu@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="password" placeholder="Crie uma senha" minlength="6" required style="padding-right: 50px;">
+            <button type="button" class="password-toggle" onclick="togglePassword('password', 'eyeIcon1')">
+              <svg id="eyeIcon1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="form-hint">Minimo 6 caracteres</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <div class="form-input-wrapper">
+            <input type="password" class="form-input" id="confirmPassword" placeholder="Digite novamente" minlength="6" required style="padding-right: 50px;">
+            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', 'eyeIcon2')">
+              <svg id="eyeIcon2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-error" id="errorBox">
+          As senhas nao coincidem.
+        </div>
+
+        <button type="submit" class="btn btn-gradient">Criar conta</button>
+
+        <p class="terms">
+          Ao criar conta, voce concorda com nossos<br>
+          <a href="#">Termos de Uso</a> e <a href="#">Politica de Privacidade</a>
+        </p>
+      </form>
+
+      <p class="card-footer">
+        Ja tem conta? <a href="login.html">Entrar</a>
+      </p>
+    </div>
+
+    <a href="index.html" class="back-link">← Voltar ao inicio</a>
+  </div>
+
+  <script>
+    const passwordVisibility = {
+      password: false,
+      confirmPassword: false
+    };
+
+    function togglePassword(inputId, iconId) {
+      passwordVisibility[inputId] = !passwordVisibility[inputId];
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+
+      input.type = passwordVisibility[inputId] ? 'text' : 'password';
+
+      if (passwordVisibility[inputId]) {
+        icon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        `;
+      } else {
+        icon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorBox = document.getElementById('errorBox');
+
+      if (password !== confirmPassword) {
+        errorBox.classList.add('visible');
+        return;
+      }
+
+      errorBox.classList.remove('visible');
+      window.location.href = 'minha-conta.html';
+    });
+  </script>
+</body>
+</html>

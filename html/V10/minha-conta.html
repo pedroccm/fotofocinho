@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Conta - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --sage: #9CAF88;
+      --sage-dark: #7A8F6C;
+      --terracotta: #C17F59;
+      --terracotta-dark: #A66B47;
+      --sand: #F5F0E8;
+      --cream: #FFFDF9;
+      --earth: #5C4B3A;
+      --text: #3D3229;
+      --text-muted: #8B7E72;
+      --success: #6B9B5B;
+      --warning: #D4A24C;
+      --info: #5B8B9B;
+    }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--sand);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .blob {
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: var(--sage);
+      opacity: 0.15;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      top: -150px;
+      right: -150px;
+      z-index: 0;
+    }
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, var(--sand) 60%, transparent 100%);
+    }
+    .logo {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--earth);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 8px; }
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 100px;
+      transition: all 0.3s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-link.primary {
+      background: var(--sage);
+      color: white;
+    }
+    .nav-link.primary:hover {
+      background: var(--sage-dark);
+    }
+    .nav-link.danger:hover { color: #C75050; }
+    .main {
+      margin-top: 80px;
+      flex: 1;
+      padding: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+    .user-info h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--earth);
+      margin-bottom: 4px;
+    }
+    .user-info p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--terracotta);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--terracotta-dark);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--sage);
+      color: var(--sage-dark);
+    }
+    .btn-outline:hover {
+      background: var(--sage);
+      color: white;
+    }
+    .btn-sm {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+    .stat-card {
+      background: var(--cream);
+      border-radius: 20px;
+      padding: 28px;
+      text-align: center;
+    }
+    .stat-card h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-family: 'Fraunces', serif;
+      font-size: 40px;
+      font-weight: 600;
+      color: var(--terracotta);
+    }
+    .section-header {
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--earth);
+    }
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .order-card {
+      background: var(--cream);
+      border-radius: 20px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 80px 1fr auto auto auto auto;
+      align-items: center;
+      gap: 24px;
+      transition: all 0.3s;
+    }
+    .order-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    }
+    .order-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .order-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .order-info h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .order-info span {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .order-date, .order-price { text-align: center; }
+    .order-date-label, .order-price-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .order-date-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .order-price-value {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--earth);
+    }
+    .badge {
+      display: inline-flex;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 100px;
+    }
+    .badge-success {
+      background: rgba(107, 155, 91, 0.15);
+      color: var(--success);
+    }
+    .badge-warning {
+      background: rgba(212, 162, 76, 0.15);
+      color: var(--warning);
+    }
+    .badge-info {
+      background: rgba(91, 139, 155, 0.15);
+      color: var(--info);
+    }
+    .order-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .footer {
+      padding: 24px 48px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    @media (max-width: 900px) {
+      .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .order-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 16px;
+      }
+      .order-thumb {
+        margin: 0 auto;
+      }
+      .order-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob"></div>
+  <nav class="nav">
+    <a href="index.html" class="logo">fotofocinho</a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link primary">Criar novo</a>
+      <a href="login.html" class="nav-link danger">Sair</a>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="container">
+      <div class="page-header">
+        <div class="user-info">
+          <h1>Ola, Pedro</h1>
+          <p>pedro@email.com</p>
+        </div>
+        <a href="index.html" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Novo retrato
+        </a>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total de pedidos</h3>
+          <div class="stat-value">3</div>
+        </div>
+        <div class="stat-card">
+          <h3>Retratos criados</h3>
+          <div class="stat-value">5</div>
+        </div>
+        <div class="stat-card">
+          <h3>Total gasto</h3>
+          <div class="stat-value">R$317</div>
+        </div>
+      </div>
+      <div class="section-header">
+        <h2 class="section-title">Meus pedidos</h2>
+      </div>
+      <div class="orders-list">
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/dog1/renaissance.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Canvas 40x60cm</h4>
+            <span>Estilo Renascenca</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">15 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$199</div>
+          </div>
+          <span class="badge badge-success">Pago</span>
+          <div class="order-actions">
+            <button class="btn btn-outline btn-sm">Download</button>
+          </div>
+        </div>
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/gato/baroque.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Fine Art 30x40cm</h4>
+            <span>Estilo Barroco</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">10 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$89</div>
+          </div>
+          <span class="badge badge-info">Enviado</span>
+          <div class="order-actions">
+            <button class="btn btn-outline btn-sm">Rastrear</button>
+            <button class="btn btn-outline btn-sm">Download</button>
+          </div>
+        </div>
+        <div class="order-card">
+          <div class="order-thumb">
+            <img src="../../samples/output/dog2/royal.jpg" alt="Portrait">
+          </div>
+          <div class="order-info">
+            <h4>Digital</h4>
+            <span>Estilo Real</span>
+          </div>
+          <div class="order-date">
+            <div class="order-date-label">Data</div>
+            <div class="order-date-value">18 jan. 2025</div>
+          </div>
+          <div class="order-price">
+            <div class="order-price-label">Valor</div>
+            <div class="order-price-value">R$29</div>
+          </div>
+          <span class="badge badge-warning">Aguardando</span>
+          <div class="order-actions">
+            <button class="btn btn-primary btn-sm">Pagar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2025 Fotofocinho. Feito com amor para pets.</p>
+  </footer>
+</body>
+</html>

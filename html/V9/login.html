@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Fotofocinho</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.03);
+      --neon-cyan: #00f5ff;
+      --neon-purple: #bf00ff;
+      --white: #ffffff;
+      --text: rgba(255,255,255,0.9);
+      --text-muted: rgba(255,255,255,0.5);
+      --border: rgba(255,255,255,0.08);
+    }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .aurora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(191, 0, 255, 0.08) 0%, transparent 50%);
+    }
+    .nav {
+      position: relative;
+      z-index: 10;
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 100px;
+      transition: all 0.3s;
+    }
+    .nav-link:hover { color: var(--white); }
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-container { width: 100%; max-width: 400px; }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .auth-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .auth-header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+    }
+    .form-group { margin-bottom: 24px; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 0 3px rgba(0,245,255,0.1);
+    }
+    .form-input::placeholder { color: var(--text-muted); }
+    .input-wrapper { position: relative; }
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+    }
+    .toggle-password:hover { color: var(--text); }
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .checkbox-label input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--neon-cyan);
+    }
+    .forgot-link {
+      font-size: 13px;
+      color: var(--neon-cyan);
+      text-decoration: none;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 24px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+      color: var(--bg);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 30px rgba(0,245,255,0.4);
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .auth-footer a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+    .footer {
+      padding: 24px 48px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <nav class="nav">
+    <a href="index.html" class="logo">fotofocinho</a>
+    <a href="register.html" class="nav-link">Criar conta</a>
+  </nav>
+  <main class="main">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1>Bem-vindo de volta</h1>
+        <p>Entre para acessar seus retratos</p>
+      </div>
+      <div class="auth-card">
+        <form>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="password" placeholder="Sua senha">
+              <button type="button" class="toggle-password" onclick="togglePassword()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-icon">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-footer">
+            <label class="checkbox-label">
+              <input type="checkbox">
+              Lembrar de mim
+            </label>
+            <a href="#" class="forgot-link">Esqueceu a senha?</a>
+          </div>
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">ou</span>
+          <div class="divider-line"></div>
+        </div>
+        <div class="auth-footer">
+          Nao tem conta? <a href="register.html">Criar conta</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer class="footer">
+    <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </footer>
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const icon = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+  </script>
+</body>
+</html>

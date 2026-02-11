@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Pet Portraits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: white;
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    /* Trustpilot Star */
+    .trustpilot-star {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background: #00b67a;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      transition: all 0.4s;
+      padding: 0 24px;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    .navbar.scrolled {
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(24px);
+      border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .navbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .logo-sub {
+      font-size: 8px;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #c9a96e;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-cta {
+      background: #c9a96e;
+      color: #0a0a0a;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .btn-cta:hover {
+      background: #dfc08a;
+    }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 130px;
+      padding-bottom: 60px;
+      position: relative;
+      text-align: center;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(201, 169, 110, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .steps-indicator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .step-active {
+      color: white;
+    }
+
+    .step-inactive {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .step-arrow {
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 16px;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 8vw, 72px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      background: linear-gradient(to bottom right, white, #c9a96e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 40px;
+    }
+
+    /* Upload Area */
+    .upload-area {
+      width: 100%;
+      max-width: 680px;
+      min-height: 220px;
+      border: 1.5px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 40px;
+    }
+
+    .upload-area:hover {
+      border-color: #c9a96e;
+      background: rgba(201, 169, 110, 0.03);
+    }
+
+    .upload-icon-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .upload-icon-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #c9a96e;
+      color: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .upload-text {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .upload-hint {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 4px;
+    }
+
+    /* Uploaded State */
+    .uploaded-preview {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .uploaded-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .uploaded-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      display: flex;
+      justify-content: center;
+    }
+
+    .uploaded-hint {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Style Selector */
+    .style-selector {
+      margin-top: 24px;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .style-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #c9a96e;
+      margin-bottom: 12px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      letter-spacing: 0.05em;
+    }
+
+    .style-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .style-btn {
+      padding: 8px 16px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .style-btn:hover {
+      border-color: #c9a96e;
+      background: rgba(201, 169, 110, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .style-btn.active {
+      border-color: #c9a96e;
+      background: rgba(201, 169, 110, 0.15);
+    }
+
+    .btn-generate {
+      margin-top: 24px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      background: linear-gradient(to bottom right, #c9a96e, #dfc08a);
+      color: #0a0a0a;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(201, 169, 110, 0.4);
+    }
+
+    /* Trust Badge */
+    .trust-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 48px;
+    }
+
+    .trust-stars {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trust-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: underline;
+      text-decoration-color: #c9a96e;
+      text-underline-offset: 3px;
+      margin-right: 8px;
+    }
+
+    .trust-sub {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.02em;
+    }
+
+    /* Gallery */
+    .gallery {
+      padding: 40px 24px 80px;
+    }
+
+    .gallery-grid {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .gallery-card {
+      width: 320px;
+      height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.5s;
+    }
+
+    .gallery-card:hover {
+      transform: scale(1.03) translateY(-4px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .gallery-card-bg {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .gallery-card-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      padding-top: 40px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    }
+
+    .gallery-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .gallery-card-style {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Marquee */
+    .marquee-section {
+      padding: 60px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+    }
+
+    .marquee-wrapper {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .marquee-content {
+      display: inline-flex;
+      animation: marquee 30s linear infinite;
+    }
+
+    .marquee-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(64px, 10vw, 128px);
+      font-weight: 900;
+      padding-right: 40px;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+
+    .marquee-star {
+      font-size: clamp(32px, 5vw, 64px);
+      color: rgba(201, 169, 110, 0.2);
+      vertical-align: middle;
+    }
+
+    /* How it Works */
+    .how-section {
+      padding: 100px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(24px, 5vw, 44px);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 64px;
+      letter-spacing: -0.02em;
+      font-style: italic;
+    }
+
+    .how-grid {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .how-card {
+      flex: 1;
+      min-width: 280px;
+      max-width: 320px;
+      text-align: center;
+    }
+
+    .how-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 300;
+      color: #c9a96e;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .how-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .how-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 1.6;
+    }
+
+    /* Pricing */
+    .pricing-section {
+      padding: 100px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .pricing-grid {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+
+    .pricing-card {
+      flex: 1;
+      min-width: 300px;
+      max-width: 360px;
+      border-radius: 20px;
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.4s;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .pricing-card.highlighted {
+      border: 1.5px solid #c9a96e;
+      background: rgba(201, 169, 110, 0.04);
+    }
+
+    .pricing-card.highlighted:hover {
+      box-shadow: 0 20px 60px rgba(201, 169, 110, 0.15);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 16px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #0a0a0a;
+      white-space: nowrap;
+    }
+
+    .pricing-badge.emerald {
+      background: #10b981;
+    }
+
+    .pricing-badge.gold {
+      background: #c9a96e;
+    }
+
+    .pricing-icon {
+      margin-bottom: 16px;
+      margin-top: 8px;
+    }
+
+    .pricing-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .pricing-price-wrapper {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .pricing-original {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.3);
+      text-decoration: line-through;
+    }
+
+    .pricing-price {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    .pricing-offer {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .pricing-offer-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ef4444;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    .pricing-features {
+      width: 100%;
+      text-align: left;
+      margin: 20px 0;
+      list-style: none;
+    }
+
+    .pricing-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 12px;
+    }
+
+    .pricing-feature svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .pricing-select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: white;
+      font-size: 14px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .pricing-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .pricing-btn.primary {
+      background: linear-gradient(to bottom right, #c9a96e, #dfc08a);
+      color: #0a0a0a;
+    }
+
+    .pricing-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(201, 169, 110, 0.3);
+    }
+
+    .pricing-btn.secondary {
+      background: transparent;
+      color: white;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .pricing-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: white;
+    }
+
+    .pricing-includes {
+      font-size: 12px;
+      color: #2dd4a0;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    /* Social Proof */
+    .social-proof {
+      padding: 80px 24px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .social-proof-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 500;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+
+    .social-proof-highlight {
+      color: #c9a96e;
+    }
+
+    .social-proof-stars {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .social-proof-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: #c9a96e;
+      margin-right: 8px;
+    }
+
+    .social-proof-source {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-left: 8px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 60px 24px 30px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+
+    .footer-brand p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 8px;
+      max-width: 260px;
+      line-height: 1.6;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .footer-link:hover {
+      color: #c9a96e;
+    }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 40px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .footer-copyright {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.2);
+      text-align: center;
+    }
+
+    /* Modal Preview */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(24px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #141414;
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 520px;
+      width: 100%;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .modal-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-hint {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.6;
+    }
+
+    .modal-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(to bottom right, #c9a96e, #dfc08a);
+      color: #0a0a0a;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(201, 169, 110, 0.3);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .gallery-card {
+        width: 280px;
+        height: 350px;
+      }
+
+      .pricing-card {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-text">Fotofocinho</span>
+        <span class="logo-sub">PET PORTRAITS</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#upload" class="nav-link">Criar</a>
+        <a href="#gallery" class="nav-link">Galeria</a>
+        <a href="#pricing" class="nav-link">Precos</a>
+      </div>
+
+      <div class="nav-actions">
+        <a href="login.html" class="nav-link">Entrar</a>
+        <a href="#upload" class="btn-cta">Comecar Gratis</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+
+    <div class="steps-indicator animate-fadeInUp">
+      <span class="step-active">Upload</span>
+      <span class="step-arrow">></span>
+      <span class="step-inactive">Preview</span>
+      <span class="step-arrow">></span>
+      <span class="step-inactive">Download ou Pedir</span>
+    </div>
+
+    <h1 class="hero-title animate-fadeInUp">
+      <em>O Retrato que</em><br>
+      <em>Seu Pet Merece</em>
+    </h1>
+
+    <p class="hero-subtitle animate-fadeInUp">
+      Preview gratuito - Sem cadastro - Sem cartao de credito
+    </p>
+
+    <!-- Upload Area - Empty State -->
+    <div class="upload-area" id="upload">
+      <div class="upload-icon-wrapper">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span class="upload-icon-badge">+</span>
+      </div>
+      <p class="upload-text">Envie a foto do seu pet</p>
+      <p class="upload-hint">Use uma foto bem iluminada - JPG ou PNG</p>
+    </div>
+
+    <!-- Style Selector (shown after upload) -->
+    <div class="style-selector" id="styleSelector" style="display: none;">
+      <p class="style-label">* Escolha o Estilo</p>
+      <div class="style-buttons">
+        <button class="style-btn active">Renascenca</button>
+        <button class="style-btn">Barroco</button>
+        <button class="style-btn">Vitoriano</button>
+        <button class="style-btn">Militar</button>
+        <button class="style-btn">Realeza</button>
+        <button class="style-btn">Almirante</button>
+      </div>
+      <button class="btn-generate">Gerar Retrato Real</button>
+    </div>
+
+    <div class="trust-badge animate-fadeInUp">
+      <div class="trust-stars">
+        <span class="trust-text">Excelente</span>
+        <span class="trustpilot-star"></span>
+        <span class="trustpilot-star"></span>
+        <span class="trustpilot-star"></span>
+        <span class="trustpilot-star"></span>
+        <span class="trustpilot-star"></span>
+      </div>
+      <span class="trust-sub">#1 em Pet Portraits</span>
+    </div>
+  </section>
+
+  <!-- Gallery -->
+  <section class="gallery" id="gallery">
+    <div class="gallery-grid">
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-name">Duke Wellington</span>
+          <span class="gallery-card-style">Renascenca</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-name">Duchess Whiskers</span>
+          <span class="gallery-card-style">Barroco</span>
+        </div>
+      </div>
+      <div class="gallery-card">
+        <div class="gallery-card-bg" style="background-image: url('../../samples/output/dog2/military.jpg');"></div>
+        <div class="gallery-card-info">
+          <span class="gallery-card-name">General Max</span>
+          <span class="gallery-card-style">Militar</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <section class="marquee-section">
+    <div class="marquee-wrapper">
+      <div class="marquee-content">
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+        <span class="marquee-text">FOTOFOCINHO <span class="marquee-star">*</span> </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it Works -->
+  <section class="how-section">
+    <h2 class="section-title">Como Funciona</h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <span class="how-number">01</span>
+        <h3 class="how-title">Envie a Foto</h3>
+        <p class="how-desc">Faca upload de uma foto bem iluminada do seu pet. Funciona com caes, gatos e outros animais.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-number">02</span>
+        <h3 class="how-title">Escolha o Estilo</h3>
+        <p class="how-desc">Selecione entre estilos como Renascenca, Barroco, Vitoriano e mais. Nossa IA cria o retrato em segundos.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-number">03</span>
+        <h3 class="how-title">Receba sua Arte</h3>
+        <p class="how-desc">Baixe em alta resolucao ou peca um quadro premium entregue na sua porta com frete gratis.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing-section" id="pricing">
+    <h2 class="section-title">Escolha seu Formato</h2>
+    <div class="pricing-grid">
+      <!-- Digital -->
+      <div class="pricing-card">
+        <span class="pricing-badge emerald">Mais Popular</span>
+        <div class="pricing-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </div>
+        <h3 class="pricing-name">Download Digital</h3>
+        <div class="pricing-price-wrapper">
+          <span class="pricing-original">R$ 39</span>
+          <span class="pricing-price">R$ 29</span>
+        </div>
+        <p class="pricing-offer">
+          <span class="pricing-offer-dot"></span>
+          Oferta por tempo limitado
+        </p>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Imagem em alta resolucao</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Sem marca d'agua</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Download instantaneo</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Uso pessoal e redes sociais</span>
+          </li>
+        </ul>
+        <button class="pricing-btn secondary">Baixar Agora</button>
+      </div>
+
+      <!-- Print -->
+      <div class="pricing-card">
+        <div class="pricing-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+        </div>
+        <h3 class="pricing-name">Fine Art Print</h3>
+        <div class="pricing-price-wrapper">
+          <span class="pricing-price">R$ 89</span>
+        </div>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Papel museum-quality archival</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Tintas resistentes ao tempo</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Inclui download digital</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Frete gratis</span>
+          </li>
+        </ul>
+        <select class="pricing-select">
+          <option>20x30cm</option>
+          <option>30x40cm</option>
+          <option>40x50cm</option>
+        </select>
+        <button class="pricing-btn secondary">Pedir Impressao</button>
+        <p class="pricing-includes">+ Inclui download digital</p>
+      </div>
+
+      <!-- Canvas -->
+      <div class="pricing-card highlighted">
+        <span class="pricing-badge gold">O Presente Perfeito</span>
+        <div class="pricing-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.5">
+            <rect x="2" y="2" width="20" height="20" rx="2" />
+            <rect x="5" y="5" width="14" height="14" rx="1" />
+          </svg>
+        </div>
+        <h3 class="pricing-name">Quadro Canvas</h3>
+        <div class="pricing-price-wrapper">
+          <span class="pricing-price">R$ 199</span>
+        </div>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Canvas premium em tela</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Pronto para pendurar</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Montagem inclusa</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Inclui download digital</span>
+          </li>
+          <li class="pricing-feature">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2dd4a0" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Frete gratis</span>
+          </li>
+        </ul>
+        <select class="pricing-select">
+          <option>30x40cm</option>
+          <option>40x60cm</option>
+          <option>50x70cm</option>
+        </select>
+        <button class="pricing-btn primary">Pedir Canvas</button>
+        <p class="pricing-includes">+ Inclui download digital</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof -->
+  <section class="social-proof">
+    <p class="social-proof-text">
+      Escolhido por <span class="social-proof-highlight">10.000+</span> donos de pets
+    </p>
+    <div class="social-proof-stars">
+      <span class="social-proof-label">Excelente</span>
+      <span class="trustpilot-star"></span>
+      <span class="trustpilot-star"></span>
+      <span class="trustpilot-star"></span>
+      <span class="trustpilot-star"></span>
+      <span class="trustpilot-star"></span>
+      <span class="social-proof-source">Trustpilot</span>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-text">Fotofocinho</span>
+        <p>Transformando pets em obras de arte desde 2025.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Termos de Uso</a>
+        <a href="#" class="footer-link">Privacidade</a>
+        <a href="#" class="footer-link">Contato</a>
+        <a href="#" class="footer-link">FAQ</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copyright">&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Preview Modal -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">X</button>
+      <h2 class="modal-title">Sua Obra-Prima esta Pronta!</h2>
+      <img src="../../samples/output/dog1/renaissance.jpg" alt="Generated portrait" class="modal-image">
+      <p class="modal-hint">Imagem com marca d'agua - escolha um formato para receber sem marca</p>
+      <button class="modal-btn" onclick="closeModal()">Ver Formatos e Precos</button>
+    </div>
+  </div>
+
+  <script>
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Style button selection
+    document.querySelectorAll('.style-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Upload area click simulation
+    document.getElementById('upload').addEventListener('click', function() {
+      // Show style selector
+      document.getElementById('styleSelector').style.display = 'block';
+
+      // Change upload area to show uploaded state
+      this.innerHTML = `
+        <div class="uploaded-preview">
+          <img src="../../samples/output/dog3/renaissance.jpg" alt="Pet" style="object-fit: cover;">
+          <div class="uploaded-overlay">
+            <span class="uploaded-hint">Clique para trocar a foto</span>
+          </div>
+        </div>
+      `;
+    });
+
+    // Generate button - show modal
+    document.querySelector('.btn-generate')?.addEventListener('click', () => {
+      document.getElementById('previewModal').classList.add('active');
+    });
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('previewModal').classList.remove('active');
+      // Scroll to pricing
+      document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Close modal on overlay click
+    document.getElementById('previewModal').addEventListener('click', (e) => {
+      if (e.target.id === 'previewModal') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>

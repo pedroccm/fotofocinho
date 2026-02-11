@@ -1,0 +1,726 @@
+"use client";
+
+import { useState, useEffect, useRef, useCallback } from "react";
+import CheckoutModal from "@/components/CheckoutModal";
+
+const STYLES = [
+  { id: "renaissance", name: "Renascença", emoji: "👑" },
+  { id: "baroque", name: "Barroco", emoji: "🏰" },
+  { id: "victorian", name: "Vitoriano", emoji: "🎩" },
+  { id: "military", name: "Militar", emoji: "⚔️" },
+  { id: "royal", name: "Realeza", emoji: "👸" },
+  { id: "admiral", name: "Almirante", emoji: "⚓" },
+];
+
+const PRICING = [
+  {
+    id: "digital" as const,
+    name: "Download Digital",
+    price: "R$ 29",
+    originalPrice: "R$ 39",
+    badge: "Mais Popular",
+    badgeColor: "bg-emerald-500",
+    features: [
+      "Imagem em alta resolução",
+      "Sem marca d'água",
+      "Download instantâneo",
+      "Uso pessoal e redes sociais",
+    ],
+    sizes: null,
+    cta: "Baixar Agora",
+    highlighted: false,
+  },
+  {
+    id: "print" as const,
+    name: "Fine Art Print",
+    price: "R$ 89",
+    originalPrice: null,
+    badge: null,
+    badgeColor: "",
+    features: [
+      "Papel museum-quality archival",
+      "Tintas resistentes ao tempo",
+      "Inclui download digital",
+      "Frete grátis",
+    ],
+    sizes: ["20x30cm", "30x40cm", "40x50cm"],
+    cta: "Pedir Impressão",
+    highlighted: false,
+  },
+  {
+    id: "canvas" as const,
+    name: "Quadro Canvas",
+    price: "R$ 199",
+    originalPrice: null,
+    badge: "O Presente Perfeito 🎁",
+    badgeColor: "bg-[#c9a96e]",
+    features: [
+      "Canvas premium em tela",
+      "Pronto para pendurar",
+      "Montagem inclusa",
+      "Inclui download digital",
+      "Frete grátis",
+    ],
+    sizes: ["30x40cm", "40x60cm", "50x70cm"],
+    cta: "Pedir Canvas",
+    highlighted: true,
+  },
+];
+
+export default function Home() {
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState("renaissance");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [checkoutProduct, setCheckoutProduct] = useState<{
+    type: "digital" | "print" | "canvas";
+    name: string;
+    price: string;
+    size?: string;
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleFileUpload = useCallback((file: File) => {
+    if (file && file.type.startsWith("image/")) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError("Imagem muito grande. Máximo 10MB.");
+        return;
+      }
+      setUploadedFile(file);
+      setError(null);
+      setGeneratedImage(null);
+      setGenerationId(null);
+      setShowPreview(false);
+      const reader = new FileReader();
+      reader.onload = (e) => setUploadedPreview(e.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileUpload(file);
+    },
+    [handleFileUpload]
+  );
+
+  const handleGenerate = async () => {
+    if (!uploadedFile) return;
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", uploadedFile);
+      formData.append("style", selectedStyle);
+
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao gerar retrato");
+      }
+
+      setGeneratedImage(data.watermarkedImage);
+      setGenerationId(data.generationId);
+      setShowPreview(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao gerar retrato. Tente novamente."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCheckout = (productType: string, size?: string) => {
+    if (!generationId) {
+      setError("Gere um retrato primeiro antes de comprar.");
+      return;
+    }
+    const plan = PRICING.find((p) => p.id === productType);
+    if (!plan) return;
+
+    // Get selected size from the dropdown if not passed
+    let selectedSize = size;
+    if (!selectedSize && plan.sizes) {
+      const selectEl = document.querySelector(
+        `select[data-product="${plan.id}"]`
+      ) as HTMLSelectElement | null;
+      selectedSize = selectEl?.value || plan.sizes[0];
+    }
+
+    setCheckoutProduct({
+      type: productType as "digital" | "print" | "canvas",
+      name: plan.name,
+      price: plan.price,
+      size: selectedSize,
+    });
+    setCheckoutOpen(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a]">
+      {/* ===== NAVBAR ===== */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 px-6 ${
+          scrolled
+            ? "bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5"
+            : "bg-transparent border-b border-transparent"
+        }`}
+      >
+        <div className="max-w-[1200px] mx-auto flex items-center justify-between h-[72px]">
+          <div className="flex flex-col">
+            <span className="font-['Playfair_Display'] text-[26px] font-bold tracking-tight leading-none">
+              Fable
+            </span>
+            <span className="text-[8px] font-medium tracking-[0.3em] text-white/40 mt-0.5">
+              PET PORTRAITS
+            </span>
+          </div>
+
+          <div className="hidden md:flex gap-9">
+            {["Criar", "Galeria", "Preços"].map((label, i) => (
+              <a
+                key={label}
+                href={["#upload", "#gallery", "#pricing"][i]}
+                className="text-white/60 text-sm font-medium tracking-wide hover:text-[#c9a96e] transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
+          <a
+            href="#upload"
+            className="bg-[#c9a96e] text-[#0a0a0a] px-5 py-2.5 rounded-full text-[13px] font-semibold hover:bg-[#dfc08a] transition-colors"
+          >
+            Começar Grátis
+          </a>
+        </div>
+      </nav>
+
+      {/* ===== HERO ===== */}
+      <section className="flex flex-col items-center pt-[130px] pb-[60px] relative text-center px-6">
+        {/* Glow */}
+        <div className="absolute -top-[200px] left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-[radial-gradient(ellipse_at_center,rgba(201,169,110,0.06)_0%,transparent_70%)] pointer-events-none" />
+
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-3 mb-10 text-[13px] font-medium">
+          <span className="text-white">Upload</span>
+          <span className="text-white/20 text-base">›</span>
+          <span className="text-white/30">Preview</span>
+          <span className="text-white/20 text-base">›</span>
+          <span className="text-white/30">Download ou Pedir</span>
+        </div>
+
+        {/* Title */}
+        <h1
+          className="font-['Playfair_Display'] text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight mb-5 animate-fadeInUp"
+        >
+          <em className="italic bg-gradient-to-br from-white to-[#c9a96e] bg-clip-text text-transparent">
+            O Retrato que
+          </em>
+          <br />
+          <em className="italic bg-gradient-to-br from-white to-[#c9a96e] bg-clip-text text-transparent">
+            Seu Pet Merece
+          </em>
+        </h1>
+
+        <p
+          className="text-[15px] text-white/50 mb-10 animate-fadeInUp"
+          style={{ animationDelay: "0.15s", opacity: 0, animationFillMode: "forwards" }}
+        >
+          Preview gratuito · Sem cadastro · Sem cartão de crédito
+        </p>
+
+        {/* ===== UPLOAD ZONE ===== */}
+        <div
+          id="upload"
+          className={`w-full max-w-[680px] min-h-[220px] border-[1.5px] border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden ${
+            dragOver
+              ? "border-[#c9a96e] bg-[#c9a96e]/[0.08]"
+              : "border-white/15 bg-white/[0.02] hover:border-[#c9a96e] hover:bg-[#c9a96e]/[0.03]"
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file);
+            }}
+          />
+
+          {uploadedPreview ? (
+            <div className="relative w-full h-[300px]">
+              <img
+                src={uploadedPreview}
+                alt="Pet"
+                className="w-full h-full object-cover rounded-xl"
+              />
+              <div className="absolute bottom-0 left-0 right-0 py-5 bg-gradient-to-t from-black/80 to-transparent flex justify-center">
+                <span className="text-[13px] text-white/70">
+                  Clique para trocar a foto
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="relative mb-4 p-5 bg-white/[0.03] rounded-2xl border border-white/[0.06]">
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#c9a96e"
+                  strokeWidth="1.5"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <div className="absolute top-2 right-2 w-[18px] h-[18px] rounded-full bg-[#c9a96e] text-[#0a0a0a] flex items-center justify-center text-[12px] font-bold">
+                  +
+                </div>
+              </div>
+              <p className="text-base font-semibold">Envie a foto do seu pet</p>
+              <p className="text-[13px] text-white/40 mt-1">
+                Use uma foto bem iluminada · JPG ou PNG
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* ===== STYLE SELECTOR + GENERATE ===== */}
+        {uploadedPreview && (
+          <div
+            className="mt-6 max-w-[680px] w-full animate-fadeInUp"
+          >
+            <p className="text-sm font-semibold text-[#c9a96e] mb-3 text-center font-['Cormorant_Garamond'] tracking-wider">
+              ✦ Escolha o Estilo
+            </p>
+            <div className="flex gap-2 justify-center flex-wrap">
+              {STYLES.map((s) => (
+                <button
+                  key={s.id}
+                  className={`px-4 py-2 rounded-full border text-[13px] font-medium flex items-center gap-1.5 transition-all duration-300 hover:-translate-y-0.5 ${
+                    selectedStyle === s.id
+                      ? "border-[#c9a96e] bg-[#c9a96e]/15 text-white"
+                      : "border-white/12 bg-white/[0.03] text-white hover:border-[#c9a96e] hover:bg-[#c9a96e]/10"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedStyle(s.id);
+                  }}
+                >
+                  <span>{s.emoji}</span>
+                  <span>{s.name}</span>
+                </button>
+              ))}
+            </div>
+
+            {error && (
+              <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            <button
+              className="mt-6 w-full py-4 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#dfc08a] text-[#0a0a0a] text-base font-bold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(201,169,110,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <span className="flex items-center justify-center gap-3">
+                  <span className="w-5 h-5 border-2 border-[#0a0a0a]/20 border-t-[#0a0a0a] rounded-full inline-block animate-[spin_0.8s_linear_infinite]" />
+                  Criando sua obra-prima...
+                </span>
+              ) : (
+                "✨ Gerar Retrato Real"
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Trustpilot */}
+        <div
+          className="flex flex-col items-center gap-1.5 mt-12 animate-fadeInUp"
+          style={{ animationDelay: "0.3s", opacity: 0, animationFillMode: "forwards" }}
+        >
+          <div className="flex items-center gap-1">
+            <span className="font-['Cormorant_Garamond'] font-bold text-base text-white underline underline-offset-[3px] decoration-[#c9a96e] mr-2">
+              Excelente
+            </span>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span key={i} className="trustpilot-star ml-0.5" />
+            ))}
+          </div>
+          <span className="text-[12px] text-white/40 tracking-wide">
+            #1 em Pet Portraits
+          </span>
+        </div>
+      </section>
+
+      {/* ===== GALLERY ===== */}
+      <section id="gallery" className="px-6 pb-20 pt-10">
+        <div className="flex justify-center gap-4 sm:gap-6 max-w-[1100px] mx-auto flex-wrap">
+          {[
+            { emoji: "🐕", name: "Duke Wellington", style: "The General" },
+            { emoji: "🐈", name: "Duchess Whiskers", style: "The Aristocrat" },
+            { emoji: "🐴", name: "Lord Thunderhoof", style: "The Knight" },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="w-[280px] sm:w-[320px] h-[350px] sm:h-[420px] rounded-2xl overflow-hidden relative cursor-pointer transition-all duration-500 hover:scale-[1.03] hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(0,0,0,0.5)]"
+            >
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(${135 + i * 30}deg, #1a1510 0%, #2a1f15 40%, #1a1510 100%)`,
+                }}
+              >
+                <span className="text-[80px]">{p.emoji}</span>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 pt-10 bg-gradient-to-t from-black/90 to-transparent">
+                <span className="font-['Playfair_Display'] text-lg font-semibold block">
+                  {p.name}
+                </span>
+                <span className="text-[12px] text-white/50 tracking-[0.05em] uppercase">
+                  {p.style}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== MARQUEE ===== */}
+      <div className="py-[60px] border-t border-b border-white/[0.04] overflow-hidden">
+        <div className="whitespace-nowrap overflow-hidden">
+          <div
+            className="inline-flex"
+            style={{ animation: "marquee 30s linear infinite" }}
+          >
+            {Array(12)
+              .fill(null)
+              .map((_, i) => (
+                <span
+                  key={i}
+                  className="font-['Playfair_Display'] text-[4rem] sm:text-[8rem] font-black pr-6 sm:pr-10 select-none"
+                  style={{
+                    color: "transparent",
+                    WebkitTextStroke: "1px rgba(255,255,255,0.08)",
+                  }}
+                >
+                  FABLE{" "}
+                  <span className="text-[2rem] sm:text-[4rem] text-[#c9a96e]/20 align-middle">
+                    ✦
+                  </span>{" "}
+                </span>
+              ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===== HOW IT WORKS ===== */}
+      <section className="py-16 sm:py-[100px] px-6 max-w-[1100px] mx-auto">
+        <h2 className="font-['Playfair_Display'] text-2xl sm:text-[2.8rem] font-bold text-center mb-10 sm:mb-16 tracking-tight italic">
+          Como Funciona
+        </h2>
+        <div className="flex gap-10 justify-center flex-wrap">
+          {[
+            {
+              num: "01",
+              title: "Envie a Foto",
+              desc: "Faça upload de uma foto bem iluminada do seu pet. Funciona com cães, gatos e outros animais.",
+            },
+            {
+              num: "02",
+              title: "Escolha o Estilo",
+              desc: "Selecione entre estilos como Renascença, Barroco, Vitoriano e mais. Nossa IA cria o retrato em segundos.",
+            },
+            {
+              num: "03",
+              title: "Receba sua Arte",
+              desc: "Baixe em alta resolução ou peça um quadro premium entregue na sua porta com frete grátis.",
+            },
+          ].map((step, i) => (
+            <div key={i} className="flex-1 min-w-[280px] max-w-[320px] text-center">
+              <span className="font-['Playfair_Display'] text-5xl font-light text-[#c9a96e] italic block mb-4">
+                {step.num}
+              </span>
+              <h3 className="font-['Cormorant_Garamond'] text-[22px] font-semibold mb-3">
+                {step.title}
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed">
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== PRICING ===== */}
+      <section id="pricing" className="py-16 sm:py-[100px] px-6 max-w-[1200px] mx-auto">
+        <h2 className="font-['Playfair_Display'] text-2xl sm:text-[2.8rem] font-bold text-center mb-10 sm:mb-16 tracking-tight italic">
+          Escolha seu Formato
+        </h2>
+        <div className="flex gap-5 justify-center items-stretch flex-col sm:flex-row flex-wrap">
+          {PRICING.map((plan) => (
+            <div
+              key={plan.id}
+              className={`w-full sm:flex-1 sm:min-w-[300px] sm:max-w-[360px] rounded-[20px] p-7 sm:p-9 flex flex-col items-center text-center relative transition-all duration-400 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)] ${
+                plan.highlighted
+                  ? "border-[1.5px] border-[#c9a96e] bg-[#c9a96e]/[0.04] hover:shadow-[0_20px_60px_rgba(201,169,110,0.15)]"
+                  : "border border-white/[0.06] bg-white/[0.03]"
+              }`}
+            >
+              {plan.badge && (
+                <span
+                  className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold tracking-wide text-[#0a0a0a] whitespace-nowrap ${plan.badgeColor}`}
+                >
+                  {plan.badge}
+                </span>
+              )}
+
+              <div className="mb-4 mt-2">
+                {plan.id === "digital" && (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" strokeWidth="1.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                )}
+                {plan.id === "print" && (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" strokeWidth="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                )}
+                {plan.id === "canvas" && (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" strokeWidth="1.5">
+                    <rect x="2" y="2" width="20" height="20" rx="2" />
+                    <rect x="5" y="5" width="14" height="14" rx="1" />
+                  </svg>
+                )}
+              </div>
+
+              <h3 className="font-['Cormorant_Garamond'] text-[22px] font-semibold mb-3">
+                {plan.name}
+              </h3>
+
+              <div className="flex items-baseline gap-2.5 mb-2">
+                {plan.originalPrice && (
+                  <span className="text-base text-white/30 line-through">
+                    {plan.originalPrice}
+                  </span>
+                )}
+                <span className="text-4xl font-bold">{plan.price}</span>
+              </div>
+
+              {plan.id === "digital" && (
+                <p className="text-[12px] text-white/40 mb-4 flex items-center">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-[pulse_2s_infinite]" />
+                  Oferta por tempo limitado
+                </p>
+              )}
+
+              <ul className="w-full text-left my-5 space-y-3">
+                {plan.features.map((f, j) => (
+                  <li key={j} className="flex items-start gap-2.5 text-sm text-white/70">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#2dd4a0"
+                      strokeWidth="2.5"
+                      className="flex-shrink-0 mt-0.5"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {plan.sizes && (
+                <select
+                  data-product={plan.id}
+                  className="w-full px-3.5 py-2.5 rounded-[10px] border border-white/10 bg-white/[0.03] text-white text-sm mb-4 outline-none cursor-pointer appearance-none"
+                >
+                  {plan.sizes.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <button
+                onClick={() => handleCheckout(plan.id)}
+                className={`w-full py-3.5 rounded-xl text-[15px] font-bold transition-all duration-300 relative overflow-hidden ${
+                  plan.highlighted
+                    ? "bg-gradient-to-br from-[#c9a96e] to-[#dfc08a] text-[#0a0a0a] hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(201,169,110,0.3)]"
+                    : "border-[1.5px] border-white/20 bg-transparent text-white hover:bg-white/5 hover:border-white"
+                }`}
+              >
+                {plan.cta}
+              </button>
+
+              {(plan.id === "print" || plan.id === "canvas") && (
+                <p className="text-[12px] text-[#2dd4a0] mt-3 font-medium">
+                  + Inclui download digital
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ===== SOCIAL PROOF ===== */}
+      <section className="py-20 px-6 text-center border-t border-white/[0.04]">
+        <p className="font-['Cormorant_Garamond'] text-[28px] font-medium italic mb-4">
+          Escolhido por <span className="text-[#c9a96e]">10.000+</span> donos
+          de pets
+        </p>
+        <div className="flex items-center justify-center gap-1">
+          <span className="font-['Cormorant_Garamond'] font-semibold text-base text-[#c9a96e] mr-2">
+            Excelente
+          </span>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <span key={i} className="trustpilot-star w-5 h-5 ml-0.5" />
+          ))}
+          <span className="text-[13px] text-white/50 ml-2">Trustpilot</span>
+        </div>
+      </section>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="border-t border-white/[0.06] pt-[60px] pb-[30px] px-6">
+        <div className="max-w-[1100px] mx-auto flex justify-between items-start flex-wrap gap-10">
+          <div>
+            <span className="font-['Playfair_Display'] text-[28px] font-bold block">
+              Fable
+            </span>
+            <p className="text-[13px] text-white/35 mt-2 max-w-[260px] leading-relaxed">
+              Transformando pets em obras de arte desde 2025.
+            </p>
+          </div>
+          <div className="flex gap-7 flex-wrap">
+            {["Termos de Uso", "Privacidade", "Contato", "FAQ"].map((l) => (
+              <a
+                key={l}
+                href="#"
+                className="text-[13px] text-white/40 font-medium hover:text-[#c9a96e] transition-colors"
+              >
+                {l}
+              </a>
+            ))}
+          </div>
+        </div>
+        <div className="max-w-[1100px] mx-auto mt-10 pt-5 border-t border-white/[0.04]">
+          <p className="text-[12px] text-white/20 text-center">
+            © 2025 Fable. Todos os direitos reservados.
+          </p>
+        </div>
+      </footer>
+
+      {/* ===== PREVIEW MODAL ===== */}
+      {showPreview && generatedImage && (
+        <div
+          className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-[200] p-6 animate-[fadeIn_0.3s_ease]"
+          onClick={() => setShowPreview(false)}
+        >
+          <div
+            className="bg-[#141414] rounded-[20px] p-9 max-w-[520px] w-full relative animate-scaleIn border border-white/[0.06] text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 bg-white/5 border-none text-white/50 w-9 h-9 rounded-full flex items-center justify-center text-base hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+              onClick={() => setShowPreview(false)}
+            >
+              ✕
+            </button>
+
+            <h2 className="font-['Playfair_Display'] text-[26px] font-bold italic mb-6">
+              Sua Obra-Prima está Pronta!
+            </h2>
+
+            <div className="relative w-full rounded-xl overflow-hidden mb-4">
+              <img
+                src={generatedImage}
+                alt="Generated portrait"
+                className="w-full h-auto block rounded-xl"
+              />
+            </div>
+
+            <p className="text-[13px] text-white/40 leading-relaxed">
+              Imagem com marca d&apos;água — escolha um formato para receber sem
+              marca
+            </p>
+
+            <button
+              className="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#dfc08a] text-[#0a0a0a] text-[15px] font-bold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(201,169,110,0.3)]"
+              onClick={() => {
+                setShowPreview(false);
+                setTimeout(() => {
+                  document
+                    .getElementById("pricing")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
+              }}
+            >
+              Ver Formatos e Preços ↓
+            </button>
+          </div>
+        </div>
+      )}
+      {/* ===== CHECKOUT MODAL ===== */}
+      {checkoutProduct && (
+        <CheckoutModal
+          isOpen={checkoutOpen}
+          onClose={() => {
+            setCheckoutOpen(false);
+            setCheckoutProduct(null);
+          }}
+          productType={checkoutProduct.type}
+          productName={checkoutProduct.name}
+          price={checkoutProduct.price}
+          size={checkoutProduct.size}
+          generationId={generationId || ""}
+        />
+      )}
+    </div>
+  );
+}

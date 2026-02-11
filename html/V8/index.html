@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fotofocinho - Retratos Reais do Seu Pet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --white: #FFFFFF;
+      --ivory: #FDFCFA;
+      --cream: #F8F6F3;
+      --gold: #C9A962;
+      --gold-dark: #A68B4B;
+      --gold-light: #E8DCC8;
+      --charcoal: #2C2C2C;
+      --text: #1A1A1A;
+      --text-muted: #6B6B6B;
+      --border: #E8E4DE;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--ivory);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--charcoal);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--cream);
+    }
+
+    .nav-link.primary {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .nav-link.primary:hover {
+      background: var(--text);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 160px 48px 120px;
+      text-align: center;
+      background: linear-gradient(180deg, var(--white) 0%, var(--ivory) 100%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--gold-light);
+      color: var(--gold-dark);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px;
+      font-weight: 500;
+      color: var(--charcoal);
+      line-height: 1.1;
+      margin-bottom: 24px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 32px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--text);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--charcoal);
+      background: var(--cream);
+    }
+
+    /* Gallery Preview */
+    .gallery-preview {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 80px;
+      padding: 0 48px;
+    }
+
+    .preview-card {
+      width: 280px;
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: all 0.3s;
+    }
+
+    .preview-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    }
+
+    .preview-card:nth-child(2) {
+      margin-top: -40px;
+    }
+
+    .preview-image {
+      height: 320px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .preview-info {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .preview-info h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .preview-info span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* How It Works */
+    .section {
+      padding: 120px 48px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--charcoal);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .step {
+      text-align: center;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 40px;
+      right: -24px;
+      width: 48px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .step-number {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--gold);
+      border: 2px solid var(--gold-light);
+      border-radius: 50%;
+      background: var(--white);
+    }
+
+    .step h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    /* Styles Section */
+    .styles-section {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .styles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .style-card {
+      background: var(--ivory);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .style-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+    }
+
+    .style-image {
+      height: 360px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .style-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.4) 100%);
+    }
+
+    .style-info {
+      padding: 24px;
+      text-align: center;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+    }
+
+    .style-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+
+    .style-info span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Pricing */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .price-card:hover {
+      border-color: var(--gold-light);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    }
+
+    .price-card.featured {
+      border-color: var(--gold);
+      position: relative;
+    }
+
+    .price-card.featured::before {
+      content: 'Mais Popular';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      background: var(--gold);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 100px;
+    }
+
+    .price-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 16px;
+    }
+
+    .price-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 56px;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .price-value small {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .price-card ul {
+      list-style: none;
+      margin: 32px 0;
+    }
+
+    .price-card li {
+      padding: 12px 0;
+      font-size: 14px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .price-card li:last-child {
+      border-bottom: none;
+    }
+
+    .price-card .btn {
+      width: 100%;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--white);
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-dark);
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero h1 {
+        font-size: 48px;
+      }
+
+      .gallery-preview {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .preview-card:nth-child(2) {
+        margin-top: 0;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .step:not(:last-child)::after {
+        display: none;
+      }
+
+      .styles-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Fotofocinho</a>
+      <div class="nav-links">
+        <a href="#como-funciona" class="nav-link">Como Funciona</a>
+        <a href="#estilos" class="nav-link">Estilos</a>
+        <a href="#precos" class="nav-link">Precos</a>
+        <a href="login.html" class="nav-link">Entrar</a>
+        <a href="register.html" class="nav-link primary">Comecar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">Exclusivo</div>
+    <h1>Eternize seu pet como realeza</h1>
+    <p>Transformamos a foto do seu companheiro em retratos dignos de palácios reais, usando inteligência artificial de última geração.</p>
+    <div class="hero-buttons">
+      <a href="register.html" class="btn btn-primary">
+        Criar meu retrato
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+      <a href="#estilos" class="btn btn-outline">Ver estilos</a>
+    </div>
+
+    <!-- Gallery Preview -->
+    <div class="gallery-preview">
+      <div class="preview-card">
+        <div class="preview-image" style="background-image: url('../../samples/output/dog1/renaissance.jpg');"></div>
+        <div class="preview-info">
+          <h4>Renascenca</h4>
+          <span>Estilo classico</span>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-image" style="background-image: url('../../samples/output/gato/baroque.jpg');"></div>
+        <div class="preview-info">
+          <h4>Barroco</h4>
+          <span>Elegancia atemporal</span>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-image" style="background-image: url('../../samples/output/dog2/royal.jpg');"></div>
+        <div class="preview-info">
+          <h4>Real</h4>
+          <span>Majestade pura</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section" id="como-funciona">
+    <div class="section-header">
+      <span class="section-label">Processo</span>
+      <h2 class="section-title">Como funciona</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Envie a foto</h3>
+        <p>Selecione uma foto clara do seu pet. Quanto melhor a qualidade, mais majestoso sera o resultado.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Escolha o estilo</h3>
+        <p>Selecione entre nossos tres estilos exclusivos de retratos reais: Renascenca, Barroco ou Real.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Receba sua obra</h3>
+        <p>Em minutos, seu retrato esta pronto para download digital ou impressao em canvas premium.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Styles -->
+  <section class="section styles-section" id="estilos">
+    <div class="section-header">
+      <span class="section-label">Colecao</span>
+      <h2 class="section-title">Nossos estilos</h2>
+    </div>
+    <div class="styles-grid">
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog3/renaissance.jpg');"></div>
+        <div class="style-info">
+          <h3>Renascenca</h3>
+          <span>Classico e refinado</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/gato2/baroque.jpg');"></div>
+        <div class="style-info">
+          <h3>Barroco</h3>
+          <span>Dramatico e elegante</span>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-image" style="background-image: url('../../samples/output/dog4/royal.jpg');"></div>
+        <div class="style-info">
+          <h3>Real</h3>
+          <span>Nobreza e majestade</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="precos">
+    <div class="section-header">
+      <span class="section-label">Investimento</span>
+      <h2 class="section-title">Escolha seu formato</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <h3>Digital</h3>
+        <div class="price-value">R$29<small>/retrato</small></div>
+        <ul>
+          <li>Alta resolucao 4K</li>
+          <li>Pronto em 5 minutos</li>
+          <li>Download ilimitado</li>
+          <li>3 estilos disponiveis</li>
+        </ul>
+        <button class="btn btn-outline">Escolher</button>
+      </div>
+      <div class="price-card featured">
+        <h3>Canvas Premium</h3>
+        <div class="price-value">R$199<small>/canvas</small></div>
+        <ul>
+          <li>Impressao em canvas</li>
+          <li>Moldura dourada inclusa</li>
+          <li>Frete gratis Brasil</li>
+          <li>Garantia vitalicia</li>
+        </ul>
+        <button class="btn btn-gold">Escolher</button>
+      </div>
+      <div class="price-card">
+        <h3>Fine Art</h3>
+        <div class="price-value">R$89<small>/impressao</small></div>
+        <ul>
+          <li>Papel fine art 300g</li>
+          <li>Cores premium</li>
+          <li>Varios tamanhos</li>
+          <li>Envio protegido</li>
+        </ul>
+        <button class="btn btn-outline">Escolher</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-logo">Fotofocinho</div>
+    <p>&copy; 2025 Fotofocinho. Todos os direitos reservados.</p>
+  </footer>
+</body>
+</html>
