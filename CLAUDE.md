@@ -3,8 +3,10 @@
 ## Deploy
 
 - **Plataforma:** Netlify
-- **CLI:** Usar `npx netlify-cli` para deploy
+- **Site:** https://fotofocinho-pet.netlify.app
+- **Admin:** https://app.netlify.com/projects/fotofocinho-pet
 - **Conta:** pedroccm@gmail.com (team: gaia)
+- **Deploy:** Automático via GitHub (push no master)
 
 ### Comandos de Deploy
 
@@ -15,11 +17,8 @@ npx netlify-cli login
 # Status do projeto
 npx netlify-cli status
 
-# Deploy para produção (Netlify faz o build no servidor)
+# Deploy manual (normalmente não precisa, é automático)
 npx netlify-cli deploy --prod
-
-# Criar novo site
-npx netlify-cli sites:create --name nome-do-site
 ```
 
 ### Variáveis de Ambiente
@@ -35,6 +34,16 @@ Configurar no Netlify Dashboard ou via CLI:
 - RESEND_API_KEY
 - RESEND_FROM
 - AIML_API_KEY
+
+### AbacatePay API Keys
+
+```
+# Dev (atual no Netlify)
+abc_dev_T4RxjGUGRbCf4HZSZteyj0bJ
+
+# Prod (comentado para quando for pra produção)
+# abc_prod_dJjsKsWtuJzsYbtNYfP4XwdB
+```
 
 ## Stack
 
