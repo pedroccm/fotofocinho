@@ -75,7 +75,8 @@ export async function GET(request: NextRequest) {
   }
 
   // Get the clean image path
-  const generation = order.pets_generations as { generated_image_path: string | null } | null;
+  const generations = order.pets_generations as Array<{ generated_image_path: string | null }> | null;
+  const generation = generations?.[0];
   const imagePath = generation?.generated_image_path;
 
   if (!imagePath) {
