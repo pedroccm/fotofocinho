@@ -70,9 +70,9 @@ export default async function MinhaContaPage() {
         paid_at: order.paid_at,
         shipped_at: order.shipped_at,
         created_at: order.created_at,
-        style: (order.pets_generations as { style: string })?.style || "renaissance",
-        generated_image_path: (order.pets_generations as { generated_image_path: string | null })?.generated_image_path || null,
-        watermarked_image_path: (order.pets_generations as { watermarked_image_path: string | null })?.watermarked_image_path || null,
+        style: ((order.pets_generations as Array<{ style: string }>)?.[0])?.style || "renaissance",
+        generated_image_path: ((order.pets_generations as Array<{ generated_image_path: string | null }>)?.[0])?.generated_image_path || null,
+        watermarked_image_path: ((order.pets_generations as Array<{ watermarked_image_path: string | null }>)?.[0])?.watermarked_image_path || null,
       }));
     }
   }
