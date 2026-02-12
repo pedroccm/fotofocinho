@@ -2,54 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import CheckoutModal from "@/components/CheckoutModal";
+import ResultCheckoutFlow from "@/components/ResultCheckoutFlow";
+import { STYLES } from "@/lib/constants";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
-
-const STYLES = [
-  { id: "renaissance", name: "Renascenca", emoji: "👑" },
-  { id: "baroque", name: "Barroco", emoji: "🏰" },
-  { id: "victorian", name: "Vitoriano", emoji: "🎩" },
-];
-
-const PRICING = [
-  {
-    id: "digital" as const,
-    name: "Digital",
-    price: "R$ 29",
-    originalPrice: null,
-    badge: null,
-    badgeColor: "",
-    features: ["Alta resolucao", "Pronto em 5 min", "Download ilimitado", "3 estilos"],
-    sizes: null,
-    cta: "Escolher",
-    highlighted: false,
-  },
-  {
-    id: "canvas" as const,
-    name: "Canvas",
-    price: "R$ 199",
-    originalPrice: null,
-    badge: "Favorito",
-    badgeColor: "bg-[var(--terracotta)]",
-    features: ["Impressao em canvas", "Moldura inclusa", "Frete gratis", "Garantia vitalicia"],
-    sizes: ["30x40cm", "40x60cm", "50x70cm"],
-    cta: "Escolher",
-    highlighted: true,
-  },
-  {
-    id: "print" as const,
-    name: "Fine Art",
-    price: "R$ 89",
-    originalPrice: null,
-    badge: null,
-    badgeColor: "",
-    features: ["Papel fine art", "Cores vibrantes", "Varios tamanhos", "Envio seguro"],
-    sizes: ["20x30cm", "30x40cm", "40x50cm"],
-    cta: "Escolher",
-    highlighted: false,
-  },
-];
 
 export default function Home() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -58,16 +14,8 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [checkoutProduct, setCheckoutProduct] = useState<{
-    type: "digital" | "print" | "canvas";
-    name: string;
-    price: string;
-    size?: string;
-  } | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
@@ -85,14 +33,13 @@ export default function Home() {
   const handleFileUpload = useCallback((file: File) => {
     if (file && file.type.startsWith("image/")) {
       if (file.size > 10 * 1024 * 1024) {
-        setError("Imagem muito grande. Maximo 10MB.");
+        setError("Imagem muito grande. Máximo 10MB.");
         return;
       }
       setUploadedFile(file);
       setError(null);
       setGeneratedImage(null);
       setGenerationId(null);
-      setShowPreview(false);
       const reader = new FileReader();
       reader.onload = (e) => setUploadedPreview(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -122,7 +69,10 @@ export default function Home() {
       if (!res.ok) throw new Error(data.error || "Erro ao gerar retrato");
       setGeneratedImage(data.watermarkedImage);
       setGenerationId(data.generationId);
-      setShowPreview(true);
+      // Scroll to result section
+      setTimeout(() => {
+        document.getElementById("result")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao gerar retrato. Tente novamente.");
     } finally {
@@ -130,27 +80,15 @@ export default function Home() {
     }
   };
 
-  const handleCheckout = (productType: string, size?: string) => {
-    if (!generationId) {
-      setError("Gere um retrato primeiro antes de comprar.");
-      return;
-    }
-    const plan = PRICING.find((p) => p.id === productType);
-    if (!plan) return;
-    let selectedSize = size;
-    if (!selectedSize && plan.sizes) {
-      const selectEl = document.querySelector(
-        'select[data-product="' + plan.id + '"]'
-      ) as HTMLSelectElement | null;
-      selectedSize = selectEl?.value || plan.sizes[0];
-    }
-    setCheckoutProduct({
-      type: productType as "digital" | "print" | "canvas",
-      name: plan.name,
-      price: plan.price,
-      size: selectedSize,
-    });
-    setCheckoutOpen(true);
+  const handleReset = () => {
+    setGeneratedImage(null);
+    setGenerationId(null);
+    setUploadedFile(null);
+    setUploadedPreview(null);
+    setError(null);
+    setTimeout(() => {
+      document.getElementById("upload")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   return (
@@ -167,13 +105,15 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-2">
           <a href="#process" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Processo</a>
           <a href="#gallery" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Galeria</a>
-          <a href="#pricing" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Precos</a>
+          <a href={generatedImage ? "#result" : "#upload"} className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">
+            {generatedImage ? "Resultado" : "Preços"}
+          </a>
           {user ? (
             <Link href="/minha-conta" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Minha Conta</Link>
           ) : (
             <Link href="/login" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Entrar</Link>
           )}
-          <a href="#upload" className="px-5 py-2.5 text-sm font-bold text-white bg-[var(--sage)] rounded-full transition-all hover:bg-[var(--sage-dark)]">Comecar</a>
+          <a href="#upload" className="px-5 py-2.5 text-sm font-bold text-white bg-[var(--sage)] rounded-full transition-all hover:bg-[var(--sage-dark)]">Começar</a>
         </div>
       </nav>
 
@@ -190,7 +130,7 @@ export default function Home() {
                 Seu pet como <span className="text-[var(--terracotta)] italic">obra de arte</span>
               </h1>
               <p className="text-lg text-[var(--text-muted)] leading-relaxed mb-10">
-                Criamos retratos artisticos unicos do seu melhor amigo, combinando inteligencia artificial com estilos classicos de pintura.
+                Criamos retratos artísticos únicos do seu melhor amigo, combinando inteligência artificial com estilos clássicos de pintura.
               </p>
               <div className="flex flex-wrap gap-4">
                 <a href="#upload" className="inline-flex items-center gap-2.5 px-8 py-4 bg-[var(--terracotta)] text-white text-[15px] font-bold rounded-full transition-all hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(193,127,89,0.3)]">
@@ -206,8 +146,8 @@ export default function Home() {
             {/* Polaroid Stack */}
             <div className="relative h-[400px] md:h-[500px] hidden md:block">
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10" style={{ top: 20, left: 20, transform: "rotate(-8deg)" }}>
-                <img src="/samples/output/dog1/renaissance.jpg" alt="Max - Renascenca" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-['Fraunces'] text-sm text-[var(--text-muted)]">Max - Renascenca</span>
+                <img src="/samples/output/dog1/renaissance.jpg" alt="Max - Renascença" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-['Fraunces'] text-sm text-[var(--text-muted)]">Max - Renascença</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[1]" style={{ top: 60, left: 140, transform: "rotate(5deg)" }}>
                 <img src="/samples/output/gato/baroque.jpg" alt="Luna - Barroco" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
@@ -251,7 +191,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <p className="text-base font-semibold text-[var(--earth)]">Arraste ou clique para enviar</p>
-                  <p className="text-[13px] text-[var(--text-muted)] mt-1">JPG ou PNG ate 10MB</p>
+                  <p className="text-[13px] text-[var(--text-muted)] mt-1">JPG ou PNG até 10MB</p>
                 </>
               )}
             </div>
@@ -294,14 +234,14 @@ export default function Home() {
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">COMO FUNCIONA</span>
             <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
-            <p className="text-[17px] text-[var(--text-muted)]">Tres passos para eternizar seu companheiro</p>
+            <p className="text-[17px] text-[var(--text-muted)]">Três passos para eternizar seu companheiro</p>
           </div>
           <div className="bg-[var(--cream)] rounded-[32px] p-8 md:p-16 max-w-[1000px] mx-auto">
             <div className="grid md:grid-cols-3 gap-12">
               {[
                 { num: "1", title: "Envie a foto", desc: "Escolha uma foto clara do seu pet. Pode ser do celular mesmo!" },
-                { num: "2", title: "Escolha o estilo", desc: "Renascenca, Barroco, Vitoriano... qual combina mais com seu pet?" },
-                { num: "3", title: "Receba sua arte", desc: "Em minutos, seu retrato esta pronto para decorar sua casa." },
+                { num: "2", title: "Escolha o estilo", desc: "Renascença, Barroco, Vitoriano... qual combina mais com seu pet?" },
+                { num: "3", title: "Receba sua arte", desc: "Em minutos, seu retrato está pronto para decorar sua casa." },
               ].map((step, i) => (
                 <div key={i} className="text-center">
                   <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--sand)] rounded-full">
@@ -320,12 +260,12 @@ export default function Home() {
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">ESTILOS</span>
             <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Nossa galeria</h2>
-            <p className="text-[17px] text-[var(--text-muted)]">Cada estilo conta uma historia diferente</p>
+            <p className="text-[17px] text-[var(--text-muted)]">Cada estilo conta uma história diferente</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
             {[
-              { img: "/samples/output/dog3/renaissance.jpg", name: "Renascenca", desc: "Classico e atemporal" },
-              { img: "/samples/output/gato2/baroque.jpg", name: "Barroco", desc: "Dramatico e elegante" },
+              { img: "/samples/output/dog3/renaissance.jpg", name: "Renascença", desc: "Clássico e atemporal" },
+              { img: "/samples/output/gato2/baroque.jpg", name: "Barroco", desc: "Dramático e elegante" },
               { img: "/samples/output/dog4/victorian.jpg", name: "Vitoriano", desc: "Nobre e majestoso" },
             ].map((item, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_48px_rgba(0,0,0,0.1)]">
@@ -339,39 +279,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="py-[100px] px-6 md:px-12">
-          <div className="text-center max-w-[600px] mx-auto mb-16">
-            <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">PLANOS</span>
-            <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Quanto custa?</h2>
-            <p className="text-[17px] text-[var(--text-muted)]">Opcoes para todos os bolsos</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
-            {PRICING.map((plan) => (
-              <div key={plan.id} className={"bg-[var(--cream)] rounded-3xl p-8 md:p-10 text-center relative transition-all duration-300 " + (plan.highlighted ? "bg-white border-2 border-[var(--terracotta)]" : "border-2 border-transparent hover:border-[var(--sage-light)]")}>
-                {plan.badge && <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-[var(--terracotta)] text-white text-xs font-bold rounded-full">{plan.badge}</span>}
-                <h3 className="font-['Fraunces'] text-[22px] font-medium text-[var(--earth)] mb-5">{plan.name}</h3>
-                <div className={"font-['Fraunces'] text-[52px] font-semibold leading-none mb-2 " + (plan.highlighted ? "text-[var(--terracotta)]" : "text-[var(--earth)]")}>
-                  {plan.price}<span className="font-['Nunito'] text-base font-normal text-[var(--text-muted)]">/un</span>
-                </div>
-                <ul className="my-8 space-y-0">
-                  {plan.features.map((f, j) => <li key={j} className="py-3 text-sm text-[var(--text-muted)] border-b border-[var(--sand)] last:border-b-0">{f}</li>)}
-                </ul>
-                {plan.sizes && (
-                  <select data-product={plan.id} className="w-full px-4 py-3 rounded-xl border border-[var(--sage-light)] bg-white text-[var(--text)] text-sm mb-4 outline-none cursor-pointer">
-                    {plan.sizes.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                )}
-                <button
-                  onClick={() => handleCheckout(plan.id)}
-                  className={"w-full py-4 rounded-full text-[15px] font-bold transition-all duration-300 " + (plan.highlighted ? "bg-[var(--terracotta)] text-white hover:bg-[var(--terracotta-dark)]" : plan.id === "print" ? "bg-[var(--sage)] text-white hover:bg-[var(--sage-dark)]" : "bg-transparent border-2 border-[var(--sage)] text-[var(--sage-dark)] hover:bg-[var(--sage)] hover:text-white")}
-                >
-                  {plan.cta}
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Result + Checkout Flow (inline, replaces modals) */}
+        {generatedImage && generationId && (
+          <ResultCheckoutFlow
+            generatedImage={generatedImage}
+            generationId={generationId}
+            onReset={handleReset}
+          />
+        )}
 
         {/* Footer */}
         <footer className="py-12 px-6 md:px-12 text-center border-t border-black/5">
@@ -379,36 +294,6 @@ export default function Home() {
           <p className="text-sm text-[var(--text-muted)]">2025 Fotofocinho. Feito com amor para pets.</p>
         </footer>
       </div>
-
-      {/* Preview Modal */}
-      {showPreview && generatedImage && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-[200] p-6" onClick={() => setShowPreview(false)}>
-          <div className="bg-white rounded-3xl p-8 md:p-10 max-w-[520px] w-full relative text-center" onClick={(e) => e.stopPropagation()}>
-            <button className="absolute top-4 right-4 bg-[var(--sand)] w-10 h-10 rounded-full flex items-center justify-center text-[var(--text-muted)] hover:bg-[var(--sage-light)] hover:text-[var(--earth)] transition-all cursor-pointer" onClick={() => setShowPreview(false)}>X</button>
-            <h2 className="font-['Fraunces'] text-[26px] font-medium text-[var(--earth)] mb-6">Sua obra-prima esta pronta!</h2>
-            <div className="relative w-full rounded-xl overflow-hidden mb-4">
-              <img src={generatedImage} alt="Generated portrait" className="w-full h-auto block rounded-xl" />
-            </div>
-            <p className="text-[13px] text-[var(--text-muted)] leading-relaxed mb-6">Imagem com marca d&apos;agua - escolha um formato para receber sem marca</p>
-            <button className="w-full py-4 rounded-full bg-[var(--terracotta)] text-white text-[15px] font-bold transition-all duration-300 hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5" onClick={() => { setShowPreview(false); setTimeout(() => { document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" }); }, 100); }}>
-              Ver Formatos e Precos
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Checkout Modal */}
-      {checkoutProduct && (
-        <CheckoutModal
-          isOpen={checkoutOpen}
-          onClose={() => { setCheckoutOpen(false); setCheckoutProduct(null); }}
-          productType={checkoutProduct.type}
-          productName={checkoutProduct.name}
-          price={checkoutProduct.price}
-          size={checkoutProduct.size}
-          generationId={generationId || ""}
-        />
-      )}
 
       <style jsx global>{`
         @keyframes morph {

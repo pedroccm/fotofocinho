@@ -33,4 +33,7 @@ export const supabaseAdmin = {
   get storage() {
     return getSupabaseAdmin().storage;
   },
+  get auth() {
+    return getSupabaseAdmin().auth;
+  },
 };

@@ -9,28 +9,28 @@ export async function applyWatermark(
   const height = metadata.height || 1024;
 
   // Create SVG watermark with diagonal repeated text
+  const fontSize = Math.round(width * 0.06);
   const watermarkSvg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900');
           .watermark {
-            font-family: 'Playfair Display', serif;
-            font-size: ${Math.round(width * 0.08)}px;
+            font-family: serif;
+            font-size: ${fontSize}px;
             font-weight: 900;
             fill: rgba(255, 255, 255, 0.15);
-            letter-spacing: 0.2em;
+            letter-spacing: 0.15em;
           }
         </style>
       </defs>
       <g transform="rotate(-30, ${width / 2}, ${height / 2})">
         ${Array.from({ length: 8 }, (_, i) =>
           Array.from(
-            { length: 4 },
+            { length: 3 },
             (_, j) =>
-              `<text x="${j * width * 0.4 - width * 0.2}" y="${
+              `<text x="${j * width * 0.5 - width * 0.2}" y="${
                 i * height * 0.18 - height * 0.1
-              }" class="watermark">FABLE</text>`
+              }" class="watermark">FOTOFOCINHO</text>`
           ).join("")
         ).join("")}
       </g>

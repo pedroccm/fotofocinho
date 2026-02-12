@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createBilling, PRODUCTS, ProductType } from "@/lib/abacatepay";
+import { createPixQrCode, PRODUCTS, ProductType } from "@/lib/abacatepay";
 import { supabaseAdmin } from "@/lib/supabase";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,7 @@ export async function POST(request: NextRequest) {
       generationId,
       size,
       customer,
+      password,
       shippingAddress,
     }: {
       productType: ProductType;
@@ -21,6 +23,7 @@ export async function POST(request: NextRequest) {
         cellphone: string;
         taxId: string;
       };
+      password?: string;
       shippingAddress?: {
         street: string;
         number: string;
@@ -71,6 +74,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     let customerId: string;
+    let isNewCustomer = false;
 
     if (existingCustomer) {
       customerId = existingCustomer.id;
@@ -99,46 +103,61 @@ export async function POST(request: NextRequest) {
         throw new Error("Erro ao criar cliente");
       }
       customerId = newCustomer.id;
+      isNewCustomer = true;
+
+      // Create Supabase Auth user with customer-chosen password
+      if (password && password.length >= 6) {
+        try {
+          const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email: customer.email,
+            password,
+            email_confirm: true,
+            user_metadata: { name: customer.name },
+          });
+          if (authError) throw authError;
+        } catch (authErr) {
+          // User might already exist in auth (registered manually)
+          console.log("Auth user creation skipped:", authErr);
+          isNewCustomer = false;
+        }
+      }
     }
 
-    // 2. Create billing in AbacatePay
-    const product = PRODUCTS[productType];
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const sizeLabel = size ? ` - ${size}` : "";
+    // Send welcome email for new accounts
+    if (isNewCustomer) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      try {
+        await sendWelcomeEmail(
+          customer.email,
+          customer.name,
+          `${appUrl}/login`
+        );
+      } catch (emailErr) {
+        console.error("Failed to send welcome email:", emailErr);
+      }
+    }
 
-    const billing = await createBilling({
-      products: [
-        {
-          externalId: `${product.externalId}-${generationId}`,
-          name: `${product.name}${sizeLabel}`,
-          description: product.description,
-          quantity: 1,
-          price: product.price,
-        },
-      ],
+    // 2. Create PIX QR Code in AbacatePay
+    const product = PRODUCTS[productType];
+    const description = product.name.substring(0, 37);
+
+    const pix = await createPixQrCode({
+      amount: product.price,
+      description,
+      expiresIn: 1800, // 30 minutes
       customer: {
         name: customer.name,
         email: customer.email,
         cellphone: customer.cellphone,
         taxId: customer.taxId,
       },
-      returnUrl: `${appUrl}/?generationId=${generationId}`,
-      completionUrl: `${appUrl}/obrigado?generationId=${generationId}&product=${productType}`,
     });
 
-    if (billing.error) {
-      throw new Error(`AbacatePay: ${billing.error}`);
+    if (pix.error) {
+      throw new Error(`AbacatePay: ${pix.error}`);
     }
 
-    // 3. Update customer with AbacatePay ID
-    if (billing.data.customer?.id) {
-      await supabaseAdmin
-        .from("pets_customers")
-        .update({ abacatepay_id: billing.data.customer.id })
-        .eq("id", customerId);
-    }
-
-    // 4. Create order in Supabase
+    // 3. Create order in Supabase
     const { data: order, error: orderError } = await supabaseAdmin
       .from("pets_orders")
       .insert({
@@ -148,8 +167,8 @@ export async function POST(request: NextRequest) {
         size: size || null,
         price_cents: product.price,
         status: "pending_payment",
-        billing_id: billing.data.id,
-        payment_url: billing.data.url,
+        billing_id: pix.data.id,
+        payment_url: null,
         shipping_address: shippingAddress || null,
       })
       .select("id")
@@ -163,9 +182,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       orderId: order?.id,
-      billingId: billing.data.id,
-      paymentUrl: billing.data.url,
-      amount: billing.data.amount,
+      pixId: pix.data.id,
+      brCode: pix.data.brCode,
+      brCodeBase64: pix.data.brCodeBase64,
+      amount: pix.data.amount,
+      expiresAt: pix.data.expiresAt,
     });
   } catch (error) {
     console.error("Checkout error:", error);

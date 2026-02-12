@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 
 interface Order {
   id: string;
@@ -23,13 +24,13 @@ interface Order {
   paid_at: string | null;
   shipped_at: string | null;
   created_at: string;
-  customers: {
+  pets_customers: {
     name: string;
     email: string;
     cellphone: string;
     tax_id: string;
   };
-  generations: {
+  pets_generations: {
     style: string;
     generated_image_path: string;
     watermarked_image_path: string;
@@ -37,19 +38,19 @@ interface Order {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending_payment: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  paid: "bg-green-500/20 text-green-400 border-green-500/30",
-  processing: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  shipped: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  delivered: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
-  refunded: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+  pending_payment: "bg-yellow-500/15 text-yellow-700 border-yellow-500/20",
+  paid: "bg-emerald-500/15 text-emerald-700 border-emerald-500/20",
+  processing: "bg-blue-500/15 text-blue-700 border-blue-500/20",
+  shipped: "bg-purple-500/15 text-purple-700 border-purple-500/20",
+  delivered: "bg-emerald-500/15 text-emerald-700 border-emerald-500/20",
+  cancelled: "bg-red-500/15 text-red-700 border-red-500/20",
+  refunded: "bg-gray-500/15 text-gray-600 border-gray-500/20",
 };
 
 const STATUS_LABELS: Record<string, string> = {
   pending_payment: "Aguardando Pagamento",
   paid: "Pago",
-  processing: "Em Produção",
+  processing: "Em Producao",
   shipped: "Enviado",
   delivered: "Entregue",
   cancelled: "Cancelado",
@@ -57,9 +58,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const PRODUCT_LABELS: Record<string, string> = {
-  digital: "📥 Digital",
-  print: "🖼️ Fine Art Print",
-  canvas: "🎨 Canvas",
+  digital: "Download Digital",
+  print: "Fine Art Print",
+  canvas: "Quadro Canvas",
 };
 
 export default function AdminPage() {
@@ -148,13 +149,16 @@ export default function AdminPage() {
   // Login screen
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-6">
-        <form onSubmit={handleLogin} className="max-w-[360px] w-full">
-          <h1 className="font-['Playfair_Display'] text-3xl font-bold italic mb-2 text-center">
-            Fable Admin
+      <div className="min-h-screen bg-[var(--sand)] flex items-center justify-center px-6 relative overflow-hidden">
+        <div className="blob-1 fixed top-[-150px] right-[-100px] w-[500px] h-[500px] bg-[var(--sage-light)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-40 z-0" />
+        <div className="blob-2 fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[var(--terracotta)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 z-0" />
+
+        <form onSubmit={handleLogin} className="max-w-[360px] w-full relative z-10">
+          <h1 className="font-['Fraunces'] text-3xl font-semibold text-[var(--earth)] mb-1 text-center">
+            fotofocinho
           </h1>
-          <p className="text-white/40 text-sm text-center mb-8">
-            Painel de gerenciamento de pedidos
+          <p className="text-[var(--text-muted)] text-sm text-center mb-8">
+            Painel de gerenciamento
           </p>
 
           <input
@@ -162,12 +166,12 @@ export default function AdminPage() {
             value={adminKey}
             onChange={(e) => setAdminKey(e.target.value)}
             placeholder="Chave de admin"
-            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-[#c9a96e] transition-colors placeholder:text-white/20 mb-4"
+            className="w-full px-4 py-3 rounded-xl bg-[var(--cream)] border border-[var(--sage-light)]/40 text-[var(--text)] text-sm outline-none focus:border-[var(--terracotta)] transition-colors placeholder:text-[var(--text-muted)]/50 mb-4"
           />
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-br from-[#c9a96e] to-[#dfc08a] text-[#0a0a0a] font-bold text-sm"
+            className="w-full py-3 rounded-full bg-[var(--terracotta)] text-white font-bold text-sm hover:bg-[var(--terracotta-dark)] transition-colors"
           >
             Entrar
           </button>
@@ -178,31 +182,35 @@ export default function AdminPage() {
 
   // Dashboard
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="border-b border-white/[0.06] px-6 py-4">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="font-['Playfair_Display'] text-2xl font-bold">
-              Fable <span className="text-[#c9a96e]">Admin</span>
-            </h1>
-          </div>
+    <div className="min-h-screen bg-[var(--sand)] relative overflow-hidden">
+      {/* Blobs */}
+      <div className="blob-1 fixed top-[-150px] right-[-100px] w-[500px] h-[500px] bg-[var(--sage-light)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-40 z-0" />
+      <div className="blob-2 fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[var(--terracotta)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 z-0" />
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
+        <Link href="/" className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)]">
+          fotofocinho
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1.5 rounded-full bg-[var(--terracotta)]/15 text-[var(--terracotta)] text-xs font-bold">
+            Admin
+          </span>
           <button
             onClick={() => {
               setAuthenticated(false);
               setAdminKey("");
             }}
-            className="text-sm text-white/40 hover:text-white transition-colors"
+            className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-red-500 hover:bg-red-500/10"
           >
             Sair
           </button>
         </div>
-      </header>
+      </nav>
 
-      <div className="max-w-[1400px] mx-auto px-6 py-8">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 pt-[120px] pb-12">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-6 flex-wrap">
-          <span className="text-sm text-white/40 font-medium">Filtrar:</span>
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
           {["all", "pending_payment", "paid", "processing", "shipped", "delivered"].map(
             (s) => (
               <button
@@ -211,10 +219,10 @@ export default function AdminPage() {
                   setStatusFilter(s);
                   setPage(1);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all border ${
                   statusFilter === s
-                    ? "bg-[#c9a96e]/20 text-[#c9a96e] border-[#c9a96e]/30"
-                    : "bg-white/[0.03] text-white/50 border-white/10 hover:border-white/20"
+                    ? "bg-[var(--terracotta)] text-white border-[var(--terracotta)]"
+                    : "bg-[var(--cream)] text-[var(--text-muted)] border-[var(--sage-light)]/40 hover:border-[var(--terracotta)]/40"
                 }`}
               >
                 {s === "all" ? "Todos" : STATUS_LABELS[s]}
@@ -224,20 +232,21 @@ export default function AdminPage() {
 
           <button
             onClick={fetchOrders}
-            className="ml-auto text-sm text-[#c9a96e] hover:text-[#dfc08a] transition-colors"
+            className="ml-auto text-sm text-[var(--terracotta)] font-semibold hover:text-[var(--terracotta-dark)] transition-colors"
           >
-            ↻ Atualizar
+            Atualizar
           </button>
         </div>
 
-        {/* Orders table */}
+        {/* Orders */}
         {loading ? (
-          <div className="text-center py-20 text-white/30">Carregando...</div>
+          <div className="text-center py-20 text-[var(--text-muted)]">Carregando...</div>
         ) : orders.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-white/30 text-lg mb-2">Nenhum pedido encontrado</p>
-            <p className="text-white/20 text-sm">
-              Os pedidos aparecerão aqui quando os clientes comprarem.
+            <div className="text-4xl mb-4">📋</div>
+            <p className="text-[var(--earth)] text-lg font-medium mb-2">Nenhum pedido encontrado</p>
+            <p className="text-[var(--text-muted)] text-sm">
+              Os pedidos aparecerao aqui quando os clientes comprarem.
             </p>
           </div>
         ) : (
@@ -245,7 +254,7 @@ export default function AdminPage() {
             {orders.map((order) => (
               <div
                 key={order.id}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 hover:border-white/10 transition-all cursor-pointer"
+                className="bg-[var(--cream)] border border-[var(--sage-light)]/30 rounded-2xl p-5 hover:border-[var(--terracotta)]/30 transition-all cursor-pointer"
                 onClick={() => {
                   setSelectedOrder(order);
                   setTrackingInput(order.tracking_code || "");
@@ -255,35 +264,35 @@ export default function AdminPage() {
                 <div className="flex items-start justify-between flex-wrap gap-4">
                   <div className="flex-1 min-w-[200px]">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm font-semibold">
+                      <span className="text-sm font-semibold text-[var(--earth)]">
                         {PRODUCT_LABELS[order.product_type] || order.product_type}
                       </span>
                       {order.size && (
-                        <span className="text-xs text-white/40">({order.size})</span>
+                        <span className="text-xs text-[var(--text-muted)]">({order.size})</span>
                       )}
                       <span
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
-                          STATUS_COLORS[order.status] || "bg-white/10 text-white/50"
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                          STATUS_COLORS[order.status] || "bg-gray-200 text-gray-600"
                         }`}
                       >
                         {STATUS_LABELS[order.status] || order.status}
                       </span>
                     </div>
-                    <p className="text-sm text-white/60">
-                      {order.customers?.name} · {order.customers?.email}
+                    <p className="text-sm text-[var(--text-muted)]">
+                      {order.pets_customers?.name} · {order.pets_customers?.email}
                     </p>
                     {order.tracking_code && (
-                      <p className="text-xs text-[#c9a96e] mt-1">
+                      <p className="text-xs text-[var(--terracotta)] font-medium mt-1">
                         Rastreio: {order.tracking_code}
                       </p>
                     )}
                   </div>
 
                   <div className="text-right">
-                    <p className="text-lg font-bold">
+                    <p className="text-lg font-bold text-[var(--earth)]">
                       R$ {(order.price_cents / 100).toFixed(2)}
                     </p>
-                    <p className="text-xs text-white/30">
+                    <p className="text-xs text-[var(--text-muted)]">
                       {new Date(order.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
@@ -299,19 +308,19 @@ export default function AdminPage() {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1}
-              className="px-3 py-1.5 rounded-lg text-sm bg-white/[0.03] border border-white/10 disabled:opacity-30"
+              className="px-4 py-2 rounded-full text-sm bg-[var(--cream)] border border-[var(--sage-light)]/40 text-[var(--text-muted)] disabled:opacity-30"
             >
-              ← Anterior
+              Anterior
             </button>
-            <span className="text-sm text-white/40">
-              Página {page} de {totalPages}
+            <span className="text-sm text-[var(--text-muted)]">
+              Pagina {page} de {totalPages}
             </span>
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1.5 rounded-lg text-sm bg-white/[0.03] border border-white/10 disabled:opacity-30"
+              className="px-4 py-2 rounded-full text-sm bg-[var(--cream)] border border-[var(--sage-light)]/40 text-[var(--text-muted)] disabled:opacity-30"
             >
-              Próxima →
+              Proxima
             </button>
           </div>
         )}
@@ -320,49 +329,49 @@ export default function AdminPage() {
       {/* Order detail modal */}
       {selectedOrder && (
         <div
-          className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center z-[200] p-4"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[200] p-4"
           onClick={() => setSelectedOrder(null)}
         >
           <div
-            className="bg-[#141414] rounded-[20px] p-8 max-w-[600px] w-full relative border border-white/[0.06] max-h-[90vh] overflow-y-auto animate-scaleIn"
+            className="bg-[var(--cream)] rounded-[20px] p-8 max-w-[600px] w-full relative border border-[var(--sage-light)]/30 max-h-[90vh] overflow-y-auto animate-scaleIn shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-4 right-4 bg-white/5 border-none text-white/50 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-all cursor-pointer"
+              className="absolute top-4 right-4 bg-[var(--sage-light)]/20 border-none text-[var(--text-muted)] w-9 h-9 rounded-full flex items-center justify-center hover:bg-[var(--sage-light)]/40 transition-all cursor-pointer"
               onClick={() => setSelectedOrder(null)}
             >
               ✕
             </button>
 
-            <h2 className="font-['Playfair_Display'] text-xl font-bold italic mb-6">
+            <h2 className="font-['Fraunces'] text-xl font-semibold text-[var(--earth)] mb-6">
               Detalhes do Pedido
             </h2>
 
             {/* Order info */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1">
                   Produto
                 </span>
-                <span className="text-sm font-semibold">
+                <span className="text-sm font-semibold text-[var(--earth)]">
                   {PRODUCT_LABELS[selectedOrder.product_type]}
                   {selectedOrder.size && ` (${selectedOrder.size})`}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1">
                   Valor
                 </span>
-                <span className="text-sm font-semibold">
+                <span className="text-sm font-semibold text-[var(--earth)]">
                   R$ {(selectedOrder.price_cents / 100).toFixed(2)}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1">
                   Status
                 </span>
                 <span
-                  className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
+                  className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                     STATUS_COLORS[selectedOrder.status]
                   }`}
                 >
@@ -370,46 +379,46 @@ export default function AdminPage() {
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-1">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1">
                   Estilo
                 </span>
-                <span className="text-sm capitalize">
-                  {selectedOrder.generations?.style}
+                <span className="text-sm capitalize text-[var(--earth)]">
+                  {selectedOrder.pets_generations?.style}
                 </span>
               </div>
             </div>
 
             {/* Customer info */}
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 mb-4">
-              <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-2">
+            <div className="bg-[var(--sand)] border border-[var(--sage-light)]/30 rounded-xl p-4 mb-4">
+              <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-2">
                 Cliente
               </span>
-              <p className="text-sm font-semibold">{selectedOrder.customers?.name}</p>
-              <p className="text-xs text-white/50 mt-1">
-                {selectedOrder.customers?.email} · {selectedOrder.customers?.cellphone}
+              <p className="text-sm font-semibold text-[var(--earth)]">{selectedOrder.pets_customers?.name}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">
+                {selectedOrder.pets_customers?.email} · {selectedOrder.pets_customers?.cellphone}
               </p>
-              <p className="text-xs text-white/40 mt-0.5">
-                CPF: {selectedOrder.customers?.tax_id}
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                CPF: {selectedOrder.pets_customers?.tax_id}
               </p>
             </div>
 
             {/* Shipping address */}
             {selectedOrder.shipping_address && (
-              <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 mb-4">
-                <span className="text-[10px] text-white/30 uppercase tracking-wider block mb-2">
-                  Endereço de Entrega
+              <div className="bg-[var(--sand)] border border-[var(--sage-light)]/30 rounded-xl p-4 mb-4">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-2">
+                  Endereco de Entrega
                 </span>
-                <p className="text-sm text-white/70">
+                <p className="text-sm text-[var(--earth)]">
                   {selectedOrder.shipping_address.street},{" "}
                   {selectedOrder.shipping_address.number}
                   {selectedOrder.shipping_address.complement &&
                     ` - ${selectedOrder.shipping_address.complement}`}
                 </p>
-                <p className="text-sm text-white/70">
+                <p className="text-sm text-[var(--earth)]">
                   {selectedOrder.shipping_address.neighborhood} ·{" "}
                   {selectedOrder.shipping_address.city}/{selectedOrder.shipping_address.state}
                 </p>
-                <p className="text-sm text-white/70">
+                <p className="text-sm text-[var(--earth)]">
                   CEP: {selectedOrder.shipping_address.zip}
                 </p>
               </div>
@@ -419,30 +428,30 @@ export default function AdminPage() {
             {(selectedOrder.product_type === "print" ||
               selectedOrder.product_type === "canvas") && (
               <div className="mb-4">
-                <label className="text-[10px] text-white/30 uppercase tracking-wider block mb-1.5">
-                  Código de Rastreio (Correios)
+                <label className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1.5">
+                  Codigo de Rastreio (Correios)
                 </label>
                 <input
                   type="text"
                   value={trackingInput}
                   onChange={(e) => setTrackingInput(e.target.value)}
                   placeholder="AA123456789BR"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-[#c9a96e] transition-colors placeholder:text-white/20"
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--sand)] border border-[var(--sage-light)]/40 text-[var(--text)] text-sm outline-none focus:border-[var(--terracotta)] transition-colors placeholder:text-[var(--text-muted)]/50"
                 />
               </div>
             )}
 
             {/* Notes */}
             <div className="mb-6">
-              <label className="text-[10px] text-white/30 uppercase tracking-wider block mb-1.5">
-                Observações internas
+              <label className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mb-1.5">
+                Observacoes internas
               </label>
               <textarea
                 value={notesInput}
                 onChange={(e) => setNotesInput(e.target.value)}
                 placeholder="Notas sobre o pedido..."
                 rows={2}
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white text-sm outline-none focus:border-[#c9a96e] transition-colors placeholder:text-white/20 resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-[var(--sand)] border border-[var(--sage-light)]/40 text-[var(--text)] text-sm outline-none focus:border-[var(--terracotta)] transition-colors placeholder:text-[var(--text-muted)]/50 resize-none"
               />
             </div>
 
@@ -458,9 +467,9 @@ export default function AdminPage() {
                     })
                   }
                   disabled={updating}
-                  className="flex-1 py-3 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-400 text-sm font-semibold hover:bg-purple-500/30 transition-all disabled:opacity-50"
+                  className="flex-1 py-3 rounded-full bg-purple-500/15 border border-purple-500/20 text-purple-700 text-sm font-semibold hover:bg-purple-500/25 transition-all disabled:opacity-50"
                 >
-                  {updating ? "Salvando..." : "📦 Marcar como Enviado"}
+                  {updating ? "Salvando..." : "Marcar como Enviado"}
                 </button>
               )}
 
@@ -473,9 +482,9 @@ export default function AdminPage() {
                     })
                   }
                   disabled={updating}
-                  className="flex-1 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/30 transition-all disabled:opacity-50"
+                  className="flex-1 py-3 rounded-full bg-emerald-500/15 border border-emerald-500/20 text-emerald-700 text-sm font-semibold hover:bg-emerald-500/25 transition-all disabled:opacity-50"
                 >
-                  {updating ? "Salvando..." : "✅ Marcar como Entregue"}
+                  {updating ? "Salvando..." : "Marcar como Entregue"}
                 </button>
               )}
 
@@ -488,9 +497,9 @@ export default function AdminPage() {
                     })
                   }
                   disabled={updating}
-                  className="flex-1 py-3 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 text-sm font-semibold hover:bg-blue-500/30 transition-all disabled:opacity-50"
+                  className="flex-1 py-3 rounded-full bg-blue-500/15 border border-blue-500/20 text-blue-700 text-sm font-semibold hover:bg-blue-500/25 transition-all disabled:opacity-50"
                 >
-                  {updating ? "Salvando..." : "🖨️ Iniciar Produção"}
+                  {updating ? "Salvando..." : "Iniciar Producao"}
                 </button>
               )}
 
@@ -502,9 +511,9 @@ export default function AdminPage() {
                   })
                 }
                 disabled={updating}
-                className="px-6 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-white/60 text-sm font-semibold hover:bg-white/[0.06] transition-all disabled:opacity-50"
+                className="px-6 py-3 rounded-full bg-[var(--sage-light)]/20 border border-[var(--sage-light)]/40 text-[var(--text-muted)] text-sm font-semibold hover:bg-[var(--sage-light)]/40 transition-all disabled:opacity-50"
               >
-                💾 Salvar
+                Salvar
               </button>
             </div>
           </div>

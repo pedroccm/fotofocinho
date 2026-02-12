@@ -60,20 +60,28 @@ export default async function MinhaContaPage() {
       .order("created_at", { ascending: false });
 
     if (ordersData) {
-      orders = ordersData.map((order) => ({
-        order_id: order.id,
-        product_type: order.product_type,
-        size: order.size,
-        price_cents: order.price_cents,
-        status: order.status,
-        tracking_code: order.tracking_code,
-        paid_at: order.paid_at,
-        shipped_at: order.shipped_at,
-        created_at: order.created_at,
-        style: ((order.pets_generations as Array<{ style: string }>)?.[0])?.style || "renaissance",
-        generated_image_path: ((order.pets_generations as Array<{ generated_image_path: string | null }>)?.[0])?.generated_image_path || null,
-        watermarked_image_path: ((order.pets_generations as Array<{ watermarked_image_path: string | null }>)?.[0])?.watermarked_image_path || null,
-      }));
+      orders = ordersData.map((order) => {
+        const gen = order.pets_generations as unknown as {
+          style: string;
+          generated_image_path: string | null;
+          watermarked_image_path: string | null;
+        } | null;
+
+        return {
+          order_id: order.id,
+          product_type: order.product_type,
+          size: order.size,
+          price_cents: order.price_cents,
+          status: order.status,
+          tracking_code: order.tracking_code,
+          paid_at: order.paid_at,
+          shipped_at: order.shipped_at,
+          created_at: order.created_at,
+          style: gen?.style || "renaissance",
+          generated_image_path: gen?.generated_image_path || null,
+          watermarked_image_path: gen?.watermarked_image_path || null,
+        };
+      });
     }
   }
 

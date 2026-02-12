@@ -87,6 +87,53 @@ export async function listBillings() {
   return abacateRequest("/billing/list");
 }
 
+// PIX QR Code API
+
+interface CreatePixQrCodeParams {
+  amount: number; // in cents
+  description?: string;
+  expiresIn?: number; // seconds
+  customer?: Customer;
+}
+
+interface PixQrCodeResponse {
+  data: {
+    id: string;
+    brCode: string;
+    brCodeBase64: string;
+    amount: number;
+    status: string;
+    expiresAt: string;
+    createdAt: string;
+  };
+  error: string | null;
+}
+
+interface PixStatusResponse {
+  data: {
+    status: "PENDING" | "EXPIRED" | "CANCELLED" | "PAID" | "REFUNDED";
+    expiresAt: string;
+  };
+  error: string | null;
+}
+
+export async function createPixQrCode(
+  params: CreatePixQrCodeParams
+): Promise<PixQrCodeResponse> {
+  return abacateRequest("/pixQrCode/create", "POST", {
+    amount: params.amount,
+    ...(params.description ? { description: params.description } : {}),
+    ...(params.expiresIn ? { expiresIn: params.expiresIn } : {}),
+    ...(params.customer ? { customer: params.customer } : {}),
+  });
+}
+
+export async function checkPixStatus(
+  pixId: string
+): Promise<PixStatusResponse> {
+  return abacateRequest(`/pixQrCode/check?id=${pixId}`);
+}
+
 // Product definitions with prices in cents
 export const PRODUCTS = {
   digital: {

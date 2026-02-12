@@ -27,13 +27,13 @@ interface Props {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending_payment: { label: "Aguardando Pagamento", color: "bg-yellow-500/20 text-yellow-400" },
-  paid: { label: "Pago", color: "bg-emerald-500/20 text-emerald-400" },
-  processing: { label: "Processando", color: "bg-blue-500/20 text-blue-400" },
-  shipped: { label: "Enviado", color: "bg-purple-500/20 text-purple-400" },
-  delivered: { label: "Entregue", color: "bg-emerald-500/20 text-emerald-400" },
-  cancelled: { label: "Cancelado", color: "bg-red-500/20 text-red-400" },
-  refunded: { label: "Reembolsado", color: "bg-gray-500/20 text-gray-400" },
+  pending_payment: { label: "Aguardando Pagamento", color: "bg-yellow-500/20 text-yellow-600" },
+  paid: { label: "Pago", color: "bg-emerald-500/20 text-emerald-600" },
+  processing: { label: "Processando", color: "bg-blue-500/20 text-blue-600" },
+  shipped: { label: "Enviado", color: "bg-purple-500/20 text-purple-600" },
+  delivered: { label: "Entregue", color: "bg-emerald-500/20 text-emerald-600" },
+  cancelled: { label: "Cancelado", color: "bg-red-500/20 text-red-600" },
+  refunded: { label: "Reembolsado", color: "bg-gray-500/20 text-gray-600" },
 };
 
 const PRODUCT_LABELS: Record<string, string> = {
@@ -43,7 +43,7 @@ const PRODUCT_LABELS: Record<string, string> = {
 };
 
 const STYLE_LABELS: Record<string, string> = {
-  renaissance: "Renascença",
+  renaissance: "Renascenca",
   baroque: "Barroco",
   victorian: "Vitoriano",
 };
@@ -75,7 +75,6 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
   const handleDownload = async (orderId: string, generatedPath: string | null) => {
     if (!generatedPath) return;
 
-    // For paid orders, fetch the clean image
     try {
       const response = await fetch(`/api/download?orderId=${orderId}`);
       if (!response.ok) {
@@ -97,72 +96,69 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
   };
 
   return (
-    <div className="min-h-screen bg-[var(--sand)] flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-[var(--sand)]/95 backdrop-blur-xl border-b border-[var(--sage-light)]/20 px-6">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between h-[72px]">
-          <Link href="/" className="flex flex-col">
-            <span className="font-['Fraunces'] text-[26px] font-bold tracking-tight leading-none">
-              Fotofocinho
-            </span>
-            <span className="text-[8px] font-medium tracking-[0.3em] text-[var(--text)]/40 mt-0.5">
-              PET PORTRAITS
-            </span>
-          </Link>
+    <div className="min-h-screen bg-[var(--sand)] relative overflow-hidden">
+      {/* Blob backgrounds (same as homepage) */}
+      <div className="blob-1 fixed top-[-150px] right-[-100px] w-[500px] h-[500px] bg-[var(--sage-light)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-40 z-0" />
+      <div className="blob-2 fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[var(--terracotta)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 z-0" />
 
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="text-[var(--text)]/60 text-sm font-medium hover:text-[var(--terracotta)] transition-colors"
-            >
-              Criar Novo
-            </Link>
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="text-[var(--text)]/60 text-sm font-medium hover:text-red-400 transition-colors"
-            >
-              {loggingOut ? "..." : "Sair"}
-            </button>
-          </div>
+      {/* Navigation (same style as homepage) */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
+        <Link href="/" className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)]">
+          fotofocinho
+        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20"
+          >
+            Criar Novo
+          </Link>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-red-500 hover:bg-red-500/10"
+          >
+            {loggingOut ? "..." : "Sair"}
+          </button>
         </div>
       </nav>
 
       {/* Content */}
-      <div className="max-w-[1000px] mx-auto px-6 py-12 flex-1">
+      <div className="relative z-10 max-w-[1000px] mx-auto px-6 pt-[120px] pb-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="font-['Fraunces'] text-3xl font-bold mb-2">
-            Olá, {userName}!
+          <h1 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium leading-[1.1] text-[var(--earth)] mb-2">
+            Ola, {userName}!
           </h1>
-          <p className="text-[var(--text)]/50 text-sm">{userEmail}</p>
+          <p className="text-[var(--text-muted)] text-sm">{userEmail}</p>
         </div>
 
         {/* Orders */}
         <div>
-          <h2 className="font-['Cormorant_Garamond'] text-xl font-semibold mb-6 flex items-center gap-2">
+          <h2 className="font-['Fraunces'] text-xl font-semibold mb-6 flex items-center gap-2">
             <span className="text-[var(--terracotta)]">Meus Pedidos</span>
-            <span className="text-[var(--text)]/30 text-sm font-normal">({orders.length})</span>
+            <span className="text-[var(--text-muted)] text-sm font-normal">({orders.length})</span>
           </h2>
 
           {orders.length === 0 ? (
             <div className="bg-[var(--cream)] border border-[var(--sage-light)]/30 rounded-2xl p-12 text-center">
               <div className="text-4xl mb-4">🖼️</div>
-              <h3 className="text-lg font-medium mb-2">Nenhum pedido ainda</h3>
-              <p className="text-[var(--text)]/50 text-sm mb-6">
+              <h3 className="text-lg font-medium mb-2 text-[var(--earth)]">Nenhum pedido ainda</h3>
+              <p className="text-[var(--text-muted)] text-sm mb-6">
                 Crie seu primeiro retrato e veja aqui!
               </p>
               <Link
                 href="/"
-                className="inline-block px-6 py-3 bg-gradient-to-br from-[var(--terracotta)] to-[var(--terracotta-dark)] text-[var(--cream)] rounded-xl font-bold text-sm hover:-translate-y-0.5 transition-transform"
+                className="inline-flex items-center gap-2.5 px-8 py-4 bg-[var(--terracotta)] text-white text-[15px] font-bold rounded-full transition-all hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(193,127,89,0.3)]"
               >
                 Criar Retrato
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </Link>
             </div>
           ) : (
             <div className="space-y-4">
               {orders.map((order) => {
-                const status = STATUS_LABELS[order.status] || { label: order.status, color: "bg-gray-500/20 text-gray-400" };
+                const status = STATUS_LABELS[order.status] || { label: order.status, color: "bg-gray-500/20 text-gray-600" };
                 const canDownload = order.status === "paid" || order.status === "delivered";
                 const watermarkedUrl = order.watermarked_image_path
                   ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/watermarked/${order.watermarked_image_path}`
@@ -192,11 +188,11 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <div>
-                          <h3 className="font-medium">
+                          <h3 className="font-medium text-[var(--earth)]">
                             {PRODUCT_LABELS[order.product_type] || order.product_type}
-                            {order.size && <span className="text-[var(--text)]/50 ml-2">({order.size})</span>}
+                            {order.size && <span className="text-[var(--text-muted)] ml-2">({order.size})</span>}
                           </h3>
-                          <p className="text-sm text-[var(--text)]/40">
+                          <p className="text-sm text-[var(--text-muted)]">
                             Estilo {STYLE_LABELS[order.style] || order.style}
                           </p>
                         </div>
@@ -205,15 +201,15 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 text-sm text-[var(--text)]/50 mb-3">
+                      <div className="flex items-center gap-4 text-sm text-[var(--text-muted)] mb-3">
                         <span>{formatDate(order.created_at)}</span>
-                        <span>•</span>
-                        <span className="font-medium text-[var(--text)]">{formatPrice(order.price_cents)}</span>
+                        <span>·</span>
+                        <span className="font-medium text-[var(--earth)]">{formatPrice(order.price_cents)}</span>
                       </div>
 
                       {order.tracking_code && (
-                        <p className="text-sm text-[var(--text)]/50 mb-3">
-                          Rastreio: <span className="text-[var(--text)] font-mono">{order.tracking_code}</span>
+                        <p className="text-sm text-[var(--text-muted)] mb-3">
+                          Rastreio: <span className="text-[var(--earth)] font-mono">{order.tracking_code}</span>
                         </p>
                       )}
 
@@ -222,13 +218,13 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
                         {canDownload && order.generated_image_path && (
                           <button
                             onClick={() => handleDownload(order.order_id, order.generated_image_path)}
-                            className="px-4 py-2 bg-[var(--terracotta)]/20 text-[var(--terracotta)] rounded-lg text-sm font-medium hover:bg-[var(--terracotta)]/30 transition-colors"
+                            className="px-4 py-2 bg-[var(--terracotta)]/15 text-[var(--terracotta)] rounded-full text-sm font-medium hover:bg-[var(--terracotta)]/25 transition-colors"
                           >
                             Download HD
                           </button>
                         )}
                         {order.status === "pending_payment" && (
-                          <span className="px-4 py-2 text-yellow-400/70 text-sm">
+                          <span className="px-4 py-2 text-yellow-600/70 text-sm">
                             Complete o pagamento para baixar
                           </span>
                         )}
@@ -243,9 +239,9 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--sage-light)]/30 py-6 px-6 mt-auto">
+      <footer className="relative z-10 border-t border-[var(--sage-light)]/30 py-6 px-6 mt-auto">
         <div className="max-w-[1000px] mx-auto text-center">
-          <p className="text-xs text-[var(--text)]/30">
+          <p className="text-xs text-[var(--text-muted)]">
             &copy; 2025 Fotofocinho. Todos os direitos reservados.
           </p>
         </div>

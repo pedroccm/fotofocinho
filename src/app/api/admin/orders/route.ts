@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     .from("pets_orders")
     .select(`
       *,
-      customers ( name, email, cellphone, tax_id ),
-      generations ( style, generated_image_path, watermarked_image_path )
+      pets_customers ( name, email, cellphone, tax_id ),
+      pets_generations ( style, generated_image_path, watermarked_image_path )
     `, { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
