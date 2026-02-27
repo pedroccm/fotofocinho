@@ -134,28 +134,3 @@ export async function checkPixStatus(
   return abacateRequest(`/pixQrCode/check?id=${pixId}`);
 }
 
-// Product definitions with prices in cents
-export const PRODUCTS = {
-  digital: {
-    externalId: "fable-digital",
-    name: "Download Digital - Retrato Real",
-    description: "Imagem em alta resolução sem marca d'água",
-    price: 2900, // R$ 29.00
-  },
-  print: {
-    externalId: "fable-print",
-    name: "Fine Art Print - Retrato Real",
-    description:
-      "Impressão em papel museum-quality archival com tintas resistentes ao tempo",
-    price: 8900, // R$ 89.00
-  },
-  canvas: {
-    externalId: "fable-canvas",
-    name: "Quadro Canvas - Retrato Real",
-    description:
-      "Canvas premium em tela, pronto para pendurar, com montagem inclusa",
-    price: 19900, // R$ 199.00
-  },
-} as const;
-
-export type ProductType = keyof typeof PRODUCTS;

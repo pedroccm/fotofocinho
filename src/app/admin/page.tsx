@@ -154,7 +154,7 @@ export default function AdminPage() {
         <div className="blob-2 fixed bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-[var(--terracotta)] rounded-[60%_40%_30%_70%/60%_30%_70%_40%] opacity-20 z-0" />
 
         <form onSubmit={handleLogin} className="max-w-[360px] w-full relative z-10">
-          <h1 className="font-['Fraunces'] text-3xl font-semibold text-[var(--earth)] mb-1 text-center">
+          <h1 className="font-[var(--font-fraunces)] text-3xl font-semibold text-[var(--earth)] mb-1 text-center">
             fotofocinho
           </h1>
           <p className="text-[var(--text-muted)] text-sm text-center mb-8">
@@ -189,7 +189,7 @@ export default function AdminPage() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)]">
+        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
           fotofocinho
         </Link>
         <div className="flex items-center gap-2">
@@ -343,7 +343,7 @@ export default function AdminPage() {
               ✕
             </button>
 
-            <h2 className="font-['Fraunces'] text-xl font-semibold text-[var(--earth)] mb-6">
+            <h2 className="font-[var(--font-fraunces)] text-xl font-semibold text-[var(--earth)] mb-6">
               Detalhes do Pedido
             </h2>
 

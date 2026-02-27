@@ -1,18 +1,22 @@
 const AIML_API_KEY = process.env.AIML_API_KEY;
 
+const BASE_PROMPT = `Formal portrait of a PET transformed into a noble figure from a classic gallery. The image must convey grandeur, serenity, and timelessness. The animal occupies a central position, seated or slightly in three-quarter view, with a direct or subtly averted gaze, evoking silent authority. The attire must dialogue with the chosen period (Renaissance, Baroque, or Victorian), with textile richness and refined ornamental detailing.
+
+Lighting: Soft lateral key light at 45°, warm temperature between 3200K–4200K. Subtle fill with a golden reflector to preserve fur texture. Slight backlight to highlight the silhouette and separate from the background. Dense shadows with smooth transitions. Camera: ARRI Alexa 35. Lens: 85mm or 100mm vintage prime. Aperture: f/2.8. ISO: 400. Shutter angle: 180°. Frame rate: 24fps. Grip: fixed tripod or static dolly. Diffusion: light frontal silk to soften texture.
+
+Background: Palatial interior or textured neutral with atmospheric depth. Heavy curtains, columns, dark library, or wall with aged painting. Blurred background with slight pictorial grain, simulating oil on canvas. Controlled depth with soft vignette on edges.
+
+Composition: Central symmetrical grid with wide margins. Dominant vertical axis. Rule of thirds applied to the animal's gaze. Negative space below for typography. Balance between dark mass (background) and light mass (face and collar). 4:5 vertical proportion.
+
+Aesthetic reference: Pictorial realism with historical theatricality and classical gravity. No visible modern elements. No caricatural humor. Palette restricted to earthy tones, golds, deep greens, and wine red. Texture simulating oil painting.`;
+
 const STYLE_PROMPTS: Record<string, string> = {
   renaissance:
-    "Transform this pet photo into a majestic Renaissance oil painting portrait. The pet should be dressed as a noble aristocrat wearing ornate royal garments with rich velvet and gold embroidery. Seated on a luxurious velvet cushion with gold tassels. Dramatic Rembrandt lighting with a rich dark background. Museum-quality fine art style reminiscent of 16th century Italian masters. Highly detailed fur texture blended seamlessly with the clothing. Warm golden tones.",
+    "Create an image representing a classic portrait of a PET in Renaissance aesthetics, with a white lace collar, deep velvet tunic, central golden medallion, balanced composition, serene expression, architectural background with columns and diffused landscape. Soft lighting, moderate contrast, and harmonious atmosphere.",
   baroque:
-    "Transform this pet photo into an opulent Baroque-era portrait painting. The pet should be dressed as a wealthy merchant prince wearing extravagant silk robes with lace collar and jeweled accessories. Dramatic chiaroscuro lighting in the style of Caravaggio. Rich, dark velvet background with a hint of draped curtain. Gilt frame worthy composition. Lavish detail in fabrics and textures.",
+    "Create an image representing a classic portrait of a PET in Baroque aesthetics, with luxurious fabrics, golden embroidery, intense light and shadow contrast, dramatic dark background with heavy red curtains. Lighting with accentuated chiaroscuro and punctual shine on metals and jewels. Theatrical and haughty expression.",
   victorian:
-    "Transform this pet photo into a distinguished Victorian-era portrait. The pet should be dressed as a proper British aristocrat wearing a fitted waistcoat, cravat, and top hat or bonnet. Seated in an ornate wingback chair. Soft, refined lighting. Muted earth tones with deep greens and burgundy. Prim and proper pose. Style of John Singer Sargent.",
-  military:
-    "Transform this pet photo into a heroic military commander portrait. The pet should be dressed in a decorated military uniform with gold epaulettes, medals, and a sash of honor. Standing proudly with a sword or near a battlefield map. Dramatic lighting with smoke in the background. Style of Jacques-Louis David's Napoleon paintings. Bold, commanding presence.",
-  royal:
-    "Transform this pet photo into a regal royal court portrait. The pet should be wearing a crown or tiara, draped in an ermine-trimmed royal cape with a jeweled brooch. Seated on an ornate golden throne. Majestic red velvet curtains in the background. Style of Hyacinthe Rigaud's portrait of Louis XIV. Ultimate luxury and grandeur.",
-  admiral:
-    "Transform this pet photo into a distinguished naval admiral portrait. The pet should be dressed in a navy blue admiral's coat with gold braiding, brass buttons, and a bicorn hat. Standing on the deck of a ship with the sea in the background. Dramatic sky. Style of 18th century British naval portraiture. Dignified and commanding.",
+    "Create an image representing a classic portrait of a PET in Victorian aesthetics, wearing a structured waistcoat, antique brooch, top hat or elegant bow. Velvet-upholstered armchair, library in the background. Soft and melancholic lighting, introspective aristocratic atmosphere.",
 };
 
 export async function generatePetPortrait(
@@ -24,7 +28,8 @@ export async function generatePetPortrait(
     throw new Error("AIML_API_KEY is not configured");
   }
 
-  const prompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
+  const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
+  const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
   const dataUrl = `data:${mimeType};base64,${imageBase64}`;
 
   console.log("Calling AIML API with base64 image...");

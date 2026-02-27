@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase-browser";
 
 interface Order {
@@ -50,6 +51,10 @@ const STYLE_LABELS: Record<string, string> = {
 
 export default function CustomerDashboard({ userName, userEmail, orders }: Props) {
   const [loggingOut, setLoggingOut] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMsg, setPasswordMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -58,6 +63,32 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMsg(null);
+
+    if (newPassword.length < 6) {
+      setPasswordMsg({ type: "error", text: "A senha deve ter pelo menos 6 caracteres" });
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordMsg({ type: "error", text: "As senhas não coincidem" });
+      return;
+    }
+
+    setPasswordLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setPasswordLoading(false);
+
+    if (error) {
+      setPasswordMsg({ type: "error", text: error.message });
+    } else {
+      setPasswordMsg({ type: "success", text: "Senha alterada com sucesso!" });
+      setNewPassword("");
+      setConfirmNewPassword("");
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -103,7 +134,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
 
       {/* Navigation (same style as homepage) */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)]">
+        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
           fotofocinho
         </Link>
         <div className="flex items-center gap-2">
@@ -127,7 +158,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
       <div className="relative z-10 max-w-[1000px] mx-auto px-6 pt-[120px] pb-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium leading-[1.1] text-[var(--earth)] mb-2">
+          <h1 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium leading-[1.1] text-[var(--earth)] mb-2">
             Ola, {userName}!
           </h1>
           <p className="text-[var(--text-muted)] text-sm">{userEmail}</p>
@@ -135,7 +166,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
 
         {/* Orders */}
         <div>
-          <h2 className="font-['Fraunces'] text-xl font-semibold mb-6 flex items-center gap-2">
+          <h2 className="font-[var(--font-fraunces)] text-xl font-semibold mb-6 flex items-center gap-2">
             <span className="text-[var(--terracotta)]">Meus Pedidos</span>
             <span className="text-[var(--text-muted)] text-sm font-normal">({orders.length})</span>
           </h2>
@@ -172,9 +203,11 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
                     {/* Thumbnail */}
                     <div className="w-24 h-24 rounded-xl overflow-hidden bg-[var(--sage-light)]/20 flex-shrink-0">
                       {watermarkedUrl ? (
-                        <img
+                        <Image
                           src={watermarkedUrl}
                           alt="Portrait"
+                          width={96}
+                          height={96}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -236,13 +269,64 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
             </div>
           )}
         </div>
+
+        {/* Change Password */}
+        <div className="mt-12">
+          <h2 className="font-[var(--font-fraunces)] text-xl font-semibold mb-6 text-[var(--terracotta)]">
+            Alterar Senha
+          </h2>
+          <div className="bg-[var(--cream)] border border-[var(--sage-light)]/30 rounded-2xl p-6 max-w-[400px]">
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Nova senha</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-[var(--sage-light)]/50 text-[var(--text)] placeholder:text-[var(--text)]/30 focus:outline-none focus:border-[var(--terracotta)] transition-colors"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Confirmar nova senha</label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-[var(--sage-light)]/50 text-[var(--text)] placeholder:text-[var(--text)]/30 focus:outline-none focus:border-[var(--terracotta)] transition-colors"
+                  placeholder="Repita a nova senha"
+                />
+              </div>
+              {passwordMsg && (
+                <div className={`p-3 rounded-xl text-sm text-center ${
+                  passwordMsg.type === "success"
+                    ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-600"
+                    : "bg-red-500/10 border border-red-500/20 text-red-400"
+                }`}>
+                  {passwordMsg.text}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full py-3.5 rounded-xl bg-gradient-to-br from-[var(--terracotta)] to-[var(--terracotta-dark)] text-[var(--cream)] text-[15px] font-bold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(201,169,110,0.3)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              >
+                {passwordLoading ? "Alterando..." : "Alterar Senha"}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-[var(--sage-light)]/30 py-6 px-6 mt-auto">
         <div className="max-w-[1000px] mx-auto text-center">
           <p className="text-xs text-[var(--text-muted)]">
-            &copy; 2025 Fotofocinho. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Fotofocinho. Todos os direitos reservados.
           </p>
         </div>
       </footer>

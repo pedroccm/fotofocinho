@@ -337,7 +337,7 @@ export default function ResultCheckoutFlow({
           <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">
             SUA OBRA-PRIMA
           </span>
-          <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">
+          <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">
             Retrato pronto!
           </h2>
           <p className="text-[17px] text-[var(--text-muted)]">
@@ -388,18 +388,71 @@ export default function ResultCheckoutFlow({
         <div className="grid md:grid-cols-[420px_1fr] gap-8 md:gap-12 items-start">
           {/* Left: Generated image */}
           <div className="md:sticky md:top-[100px]">
-            <div className="bg-white rounded-3xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-              <img
-                src={generatedImage}
-                alt="Retrato gerado"
-                className="w-full h-auto rounded-2xl"
-              />
-              {checkoutStep === "select-product" && (
-                <p className="text-center text-[12px] text-[var(--text-muted)] mt-3 mb-1">
-                  Imagem com marca d&apos;água — escolha um formato para receber sem marca
-                </p>
-              )}
-            </div>
+            {selectedProduct && (selectedProduct.type === "canvas" || selectedProduct.type === "print") ? (
+              <div className="rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+                <div
+                  className="relative flex items-center justify-center py-12 px-8"
+                  style={{
+                    background: "linear-gradient(180deg, #f0ebe3 0%, #e8e0d4 60%, #d6cec2 100%)",
+                    minHeight: 320,
+                  }}
+                >
+                  {/* Shadow on wall */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: "70%",
+                      height: "75%",
+                      background: "rgba(0,0,0,0.08)",
+                      filter: "blur(20px)",
+                      borderRadius: 8,
+                      transform: "translateY(12px)",
+                    }}
+                  />
+                  {/* Frame */}
+                  <div
+                    className="relative bg-white"
+                    style={{
+                      padding: selectedProduct.type === "canvas" ? 0 : 12,
+                      boxShadow: selectedProduct.type === "canvas"
+                        ? "inset 0 0 0 3px rgba(92,75,58,0.15), 0 4px 16px rgba(0,0,0,0.15)"
+                        : "0 2px 12px rgba(0,0,0,0.12)",
+                      borderRadius: selectedProduct.type === "canvas" ? 2 : 0,
+                    }}
+                  >
+                    <img
+                      src={generatedImage}
+                      alt="Retrato gerado"
+                      className="block"
+                      style={{
+                        width: "auto",
+                        maxWidth: 260,
+                        maxHeight: 260,
+                        borderRadius: selectedProduct.type === "canvas" ? 2 : 0,
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="bg-[var(--cream)] text-center py-3 px-4">
+                  <p className="text-[11px] text-[var(--text-muted)]">
+                    {selectedProduct.type === "canvas" ? "Preview: Canvas na parede" : "Preview: Fine Art Print emoldurado"}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-4 shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+                <img
+                  src={generatedImage}
+                  alt="Retrato gerado"
+                  className="w-full h-auto rounded-2xl"
+                />
+                {checkoutStep === "select-product" && (
+                  <p className="text-center text-[12px] text-[var(--text-muted)] mt-3 mb-1">
+                    Imagem com marca d&apos;água — escolha um formato para receber sem marca
+                  </p>
+                )}
+              </div>
+            )}
             {checkoutStep === "select-product" ? (
               <button
                 onClick={onReset}
@@ -410,11 +463,11 @@ export default function ResultCheckoutFlow({
             ) : selectedProduct && (
               <div className="mt-4 bg-[var(--cream)] rounded-2xl p-4 border-2 border-[var(--sage-light)] text-center">
                 <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide font-medium mb-1">Produto selecionado</p>
-                <p className="font-['Fraunces'] text-lg font-medium text-[var(--earth)]">
+                <p className="font-[var(--font-fraunces)] text-lg font-medium text-[var(--earth)]">
                   {selectedProduct.name}
-                  {selectedProduct.size && <span className="text-[var(--text-muted)] text-sm font-['Nunito']"> · {selectedProduct.size}</span>}
+                  {selectedProduct.size && <span className="text-[var(--text-muted)] text-sm font-[var(--font-nunito)]"> · {selectedProduct.size}</span>}
                 </p>
-                <p className="font-['Fraunces'] text-xl font-semibold text-[var(--terracotta)]">{selectedProduct.price}</p>
+                <p className="font-[var(--font-fraunces)] text-xl font-semibold text-[var(--terracotta)]">{selectedProduct.price}</p>
               </div>
             )}
           </div>
@@ -456,7 +509,7 @@ export default function ResultCheckoutFlow({
                     )}
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div className="flex-1 min-w-[200px]">
-                        <h3 className="font-['Fraunces'] text-[22px] font-medium text-[var(--earth)] mb-1">
+                        <h3 className="font-[var(--font-fraunces)] text-[22px] font-medium text-[var(--earth)] mb-1">
                           {plan.name}
                         </h3>
                         <p className="text-sm text-[var(--text-muted)]">
@@ -479,7 +532,7 @@ export default function ResultCheckoutFlow({
                         )}
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className={`font-['Fraunces'] text-[32px] font-semibold ${
+                        <span className={`font-[var(--font-fraunces)] text-[32px] font-semibold ${
                           plan.highlighted ? "text-[var(--terracotta)]" : "text-[var(--earth)]"
                         }`}>
                           {plan.price}
@@ -510,7 +563,7 @@ export default function ResultCheckoutFlow({
             {checkoutStep === "customer-data" && (
               <div key="customer-data" className="animate-slideInRight">
                 <div className="bg-[var(--cream)] rounded-2xl p-6 md:p-8 border-2 border-[var(--sage-light)]">
-                  <h3 className="font-['Fraunces'] text-[22px] font-medium text-[var(--earth)] mb-1">
+                  <h3 className="font-[var(--font-fraunces)] text-[22px] font-medium text-[var(--earth)] mb-1">
                     Seus dados
                   </h3>
                   <p className="text-sm text-[var(--text-muted)] mb-6">
@@ -628,7 +681,7 @@ export default function ResultCheckoutFlow({
             {checkoutStep === "shipping-address" && (
               <div key="shipping-address" className="animate-slideInRight">
                 <div className="bg-[var(--cream)] rounded-2xl p-6 md:p-8 border-2 border-[var(--sage-light)]">
-                  <h3 className="font-['Fraunces'] text-[22px] font-medium text-[var(--earth)] mb-1">
+                  <h3 className="font-[var(--font-fraunces)] text-[22px] font-medium text-[var(--earth)] mb-1">
                     Endereço de entrega
                   </h3>
                   <p className="text-sm text-[var(--text-muted)] mb-6">
@@ -783,7 +836,7 @@ export default function ResultCheckoutFlow({
                     </svg>
                   </div>
 
-                  <h3 className="font-['Fraunces'] text-[28px] font-medium text-[var(--earth)] mb-2">
+                  <h3 className="font-[var(--font-fraunces)] text-[28px] font-medium text-[var(--earth)] mb-2">
                     Obrigado!
                   </h3>
 
@@ -809,7 +862,7 @@ export default function ResultCheckoutFlow({
 
                   {isPhysical && (
                     <div className="bg-[var(--cream)] border-2 border-[var(--sage-light)] rounded-2xl p-5 mb-6 text-left">
-                      <h4 className="font-['Fraunces'] text-base font-semibold mb-3 text-[var(--terracotta)]">
+                      <h4 className="font-[var(--font-fraunces)] text-base font-semibold mb-3 text-[var(--terracotta)]">
                         Próximos passos
                       </h4>
                       <ul className="space-y-2 text-sm text-[var(--text-muted)]">
@@ -847,7 +900,7 @@ export default function ResultCheckoutFlow({
             {checkoutStep === "pix-payment" && pixData && (
               <div key="pix-payment" className="animate-slideInRight">
                 <div className="bg-white rounded-2xl p-6 md:p-8 border-2 border-[var(--sage-light)] text-center">
-                  <h3 className="font-['Fraunces'] text-[26px] font-medium text-[var(--earth)] mb-1">
+                  <h3 className="font-[var(--font-fraunces)] text-[26px] font-medium text-[var(--earth)] mb-1">
                     Pague com Pix
                   </h3>
                   <p className="text-sm text-[var(--text-muted)] mb-6">

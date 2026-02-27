@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPixQrCode, PRODUCTS, ProductType } from "@/lib/abacatepay";
+import { createPixQrCode } from "@/lib/abacatepay";
+import { PRODUCTS, ProductType } from "@/lib/constants";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendWelcomeEmail } from "@/lib/email";
 

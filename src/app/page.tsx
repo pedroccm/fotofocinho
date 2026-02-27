@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import ResultCheckoutFlow from "@/components/ResultCheckoutFlow";
 import { STYLES } from "@/lib/constants";
 import { createClient } from "@/lib/supabase-browser";
@@ -17,6 +18,7 @@ export default function Home() {
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -99,7 +101,7 @@ export default function Home() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)]">
+        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
           fotofocinho
         </Link>
         <div className="hidden md:flex items-center gap-2">
@@ -115,7 +117,51 @@ export default function Home() {
           )}
           <a href="#upload" className="px-5 py-2.5 text-sm font-bold text-white bg-[var(--sage)] rounded-full transition-all hover:bg-[var(--sage-dark)]">Começar</a>
         </div>
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex flex-col justify-center items-center w-10 h-10 rounded-full hover:bg-[var(--sage)]/10 transition-colors"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open menu"
+        >
+          <span className="block w-5 h-0.5 bg-[var(--earth)] mb-1.5" />
+          <span className="block w-5 h-0.5 bg-[var(--earth)] mb-1.5" />
+          <span className="block w-5 h-0.5 bg-[var(--earth)]" />
+        </button>
       </nav>
+
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] md:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMenuOpen(false)} />
+          <div className="absolute top-0 right-0 h-full w-[280px] bg-[var(--cream)] shadow-[-8px_0_32px_rgba(0,0,0,0.1)] p-6 flex flex-col transition-transform">
+            <button
+              className="self-end w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--sage)]/10 transition-colors mb-6"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--earth)" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="flex flex-col gap-2">
+              <a href="#process" onClick={() => setMenuOpen(false)} className="px-4 py-3 text-[15px] font-semibold text-[var(--text-muted)] rounded-xl transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/10">Processo</a>
+              <a href="#gallery" onClick={() => setMenuOpen(false)} className="px-4 py-3 text-[15px] font-semibold text-[var(--text-muted)] rounded-xl transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/10">Galeria</a>
+              <a href={generatedImage ? "#result" : "#upload"} onClick={() => setMenuOpen(false)} className="px-4 py-3 text-[15px] font-semibold text-[var(--text-muted)] rounded-xl transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/10">
+                {generatedImage ? "Resultado" : "Preços"}
+              </a>
+              {user ? (
+                <Link href="/minha-conta" onClick={() => setMenuOpen(false)} className="px-4 py-3 text-[15px] font-semibold text-[var(--text-muted)] rounded-xl transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/10">Minha Conta</Link>
+              ) : (
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="px-4 py-3 text-[15px] font-semibold text-[var(--text-muted)] rounded-xl transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/10">Entrar</Link>
+              )}
+            </div>
+            <div className="mt-auto">
+              <a href="#upload" onClick={() => setMenuOpen(false)} className="block w-full text-center px-5 py-3.5 text-[15px] font-bold text-white bg-[var(--sage)] rounded-full transition-all hover:bg-[var(--sage-dark)]">Começar</a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10">
@@ -126,7 +172,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--cream)] border-2 border-[var(--sage-light)] rounded-full text-[13px] font-semibold text-[var(--sage-dark)] mb-6">
                 Feito com carinho
               </div>
-              <h1 className="font-['Fraunces'] text-[44px] md:text-[60px] font-medium leading-[1.1] text-[var(--earth)] mb-6">
+              <h1 className="font-[var(--font-fraunces)] text-[44px] md:text-[60px] font-medium leading-[1.1] text-[var(--earth)] mb-6">
                 Seu pet como <span className="text-[var(--terracotta)] italic">obra de arte</span>
               </h1>
               <p className="text-lg text-[var(--text-muted)] leading-relaxed mb-10">
@@ -146,16 +192,16 @@ export default function Home() {
             {/* Polaroid Stack */}
             <div className="relative h-[400px] md:h-[500px] hidden md:block">
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10" style={{ top: 20, left: 20, transform: "rotate(-8deg)" }}>
-                <img src="/samples/output/dog1/renaissance.jpg" alt="Max - Renascença" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-['Fraunces'] text-sm text-[var(--text-muted)]">Max - Renascença</span>
+                <Image src="/samples/output/dog1/renaissance.jpg" alt="Max - Renascença" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Max - Renascença</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[1]" style={{ top: 60, left: 140, transform: "rotate(5deg)" }}>
-                <img src="/samples/output/gato/baroque.jpg" alt="Luna - Barroco" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-['Fraunces'] text-sm text-[var(--text-muted)]">Luna - Barroco</span>
+                <Image src="/samples/output/gato/baroque.jpg" alt="Luna - Barroco" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Luna - Barroco</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[2]" style={{ top: 180, left: 60, transform: "rotate(-3deg)" }}>
-                <img src="/samples/output/dog2/victorian.jpg" alt="Thor - Vitoriano" className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-['Fraunces'] text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
+                <Image src="/samples/output/dog2/victorian.jpg" alt="Thor - Vitoriano" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
               </div>
             </div>
           </div>
@@ -165,7 +211,7 @@ export default function Home() {
         <section id="upload" className="py-[80px] px-6 md:px-12">
           <div className="max-w-[680px] mx-auto text-center">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">CRIAR RETRATO</span>
-            <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
+            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
             <p className="text-[17px] text-[var(--text-muted)] mb-10">Uma foto clara e bem iluminada vai gerar o melhor resultado</p>
 
             <div
@@ -233,7 +279,7 @@ export default function Home() {
         <section id="process" className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">COMO FUNCIONA</span>
-            <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
+            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Três passos para eternizar seu companheiro</p>
           </div>
           <div className="bg-[var(--cream)] rounded-[32px] p-8 md:p-16 max-w-[1000px] mx-auto">
@@ -245,9 +291,9 @@ export default function Home() {
               ].map((step, i) => (
                 <div key={i} className="text-center">
                   <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--sand)] rounded-full">
-                    <span className="font-['Fraunces'] text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
+                    <span className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
                   </div>
-                  <h3 className="font-['Fraunces'] text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
+                  <h3 className="font-[var(--font-fraunces)] text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
                   <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">{step.desc}</p>
                 </div>
               ))}
@@ -259,7 +305,7 @@ export default function Home() {
         <section id="gallery" className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">ESTILOS</span>
-            <h2 className="font-['Fraunces'] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Nossa galeria</h2>
+            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Nossa galeria</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Cada estilo conta uma história diferente</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
@@ -269,10 +315,41 @@ export default function Home() {
               { img: "/samples/output/dog4/victorian.jpg", name: "Vitoriano", desc: "Nobre e majestoso" },
             ].map((item, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_48px_rgba(0,0,0,0.1)]">
-                <img src={item.img} alt={item.name} className="w-full h-[280px] md:h-[320px] object-cover" />
+                <Image src={item.img} alt={item.name} width={400} height={320} className="w-full h-[280px] md:h-[320px] object-cover" />
                 <div className="p-6 text-center">
-                  <h3 className="font-['Fraunces'] text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
+                  <h3 className="font-[var(--font-fraunces)] text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
                   <span className="text-sm text-[var(--text-muted)]">{item.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-[100px] px-6 md:px-12">
+          <div className="text-center max-w-[600px] mx-auto mb-16">
+            <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">DEPOIMENTOS</span>
+            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">O que dizem nossos clientes</h2>
+            <p className="text-[17px] text-[var(--text-muted)]">Mais de 500 pets transformados em obras de arte</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
+            {[
+              { name: "Carolina M.", pet: "Golden Retriever", text: "Ficou incrível! O retrato do Bento parece uma pintura de verdade. A qualidade do canvas superou minhas expectativas.", stars: 5 },
+              { name: "Rafael S.", pet: "Gato Persa", text: "Presente perfeito para minha esposa. A Luna ficou tão elegante no estilo barroco! Entrega super rápida.", stars: 5 },
+              { name: "Mariana L.", pet: "Bulldog Francês", text: "Já é o terceiro retrato que faço. O Theo fica lindo em todos os estilos! Recomendo demais.", stars: 5 },
+            ].map((review, i) => (
+              <div key={i} className="bg-[var(--cream)] rounded-2xl p-6 border border-[var(--sage-light)]/30">
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: review.stars }).map((_, j) => (
+                    <svg key={j} width="18" height="18" viewBox="0 0 24 24" fill="var(--terracotta)" stroke="none">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-[15px] text-[var(--text)] leading-relaxed mb-4">&ldquo;{review.text}&rdquo;</p>
+                <div>
+                  <p className="text-sm font-semibold text-[var(--earth)]">{review.name}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{review.pet}</p>
                 </div>
               </div>
             ))}
@@ -290,8 +367,8 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="py-12 px-6 md:px-12 text-center border-t border-black/5">
-          <div className="font-['Fraunces'] text-[28px] font-semibold text-[var(--earth)] mb-2">fotofocinho</div>
-          <p className="text-sm text-[var(--text-muted)]">2025 Fotofocinho. Feito com amor para pets.</p>
+          <div className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)] mb-2">fotofocinho</div>
+          <p className="text-sm text-[var(--text-muted)]">{new Date().getFullYear()} Fotofocinho. Feito com amor para pets.</p>
         </footer>
       </div>
 
