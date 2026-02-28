@@ -4,6 +4,18 @@ import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { STYLES } from "@/lib/constants";
 
+const ASPECT_RATIOS = [
+  { value: "9:16", label: "9:16", group: "P" },
+  { value: "2:3", label: "2:3", group: "P" },
+  { value: "3:4", label: "3:4", group: "P" },
+  { value: "4:5", label: "4:5", group: "P" },
+  { value: "1:1", label: "1:1", group: "-" },
+  { value: "5:4", label: "5:4", group: "L" },
+  { value: "4:3", label: "4:3", group: "L" },
+  { value: "3:2", label: "3:2", group: "L" },
+  { value: "16:9", label: "16:9", group: "L" },
+];
+
 interface ModelResult {
   model: string;
   label: string;
@@ -15,6 +27,8 @@ export default function TestPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("renaissance");
+  const [aimlRatio, setAimlRatio] = useState("4:5");
+  const [openrouterRatio, setOpenrouterRatio] = useState("4:5");
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<ModelResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +69,8 @@ export default function TestPage() {
       const formData = new FormData();
       formData.append("image", uploadedFile);
       formData.append("style", selectedStyle);
+      formData.append("aimlRatio", aimlRatio);
+      formData.append("openrouterRatio", openrouterRatio);
       const res = await fetch("/api/test-generate", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
@@ -72,6 +88,33 @@ export default function TestPage() {
   ];
 
   const displayResults = results || (isGenerating ? placeholders : null);
+
+  const RatioSelect = ({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) => (
+    <div className="flex items-center gap-2">
+      <span className="text-xs font-semibold text-[var(--text-muted)] whitespace-nowrap">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="px-2.5 py-1.5 bg-[var(--cream)] border border-[var(--sage-light)] rounded-lg text-xs font-semibold text-[var(--earth)] cursor-pointer focus:outline-none focus:border-[var(--sage)]"
+      >
+        <optgroup label="Portrait">
+          {ASPECT_RATIOS.filter((r) => r.group === "P").map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </optgroup>
+        <optgroup label="Square">
+          {ASPECT_RATIOS.filter((r) => r.group === "-").map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </optgroup>
+        <optgroup label="Landscape">
+          {ASPECT_RATIOS.filter((r) => r.group === "L").map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </optgroup>
+      </select>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[var(--sand)]">
@@ -124,7 +167,7 @@ export default function TestPage() {
             )}
           </div>
 
-          {/* Style selector */}
+          {/* Style selector + Ratio controls */}
           {uploadedPreview && (
             <div className="mt-6">
               <p className="text-sm font-semibold text-[var(--sage)] mb-3 tracking-wider text-center">Choose style</p>
@@ -139,6 +182,12 @@ export default function TestPage() {
                     <span>{s.name}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* Aspect ratio selectors */}
+              <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <RatioSelect value={aimlRatio} onChange={setAimlRatio} label="AIML:" />
+                <RatioSelect value={openrouterRatio} onChange={setOpenrouterRatio} label="OpenRouter:" />
               </div>
 
               {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
@@ -166,7 +215,12 @@ export default function TestPage() {
               <div key={i} className="bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 overflow-hidden">
                 {/* Model label */}
                 <div className="px-5 py-3 border-b border-[var(--sage-light)]/20 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
+                    <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
+                      {i === 0 ? aimlRatio : openrouterRatio}
+                    </span>
+                  </div>
                   {r.image && (
                     <span className="w-2 h-2 rounded-full bg-green-500" />
                   )}

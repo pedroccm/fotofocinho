@@ -15,6 +15,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("image") as File | null;
     const style = (formData.get("style") as string) || "renaissance";
+    const aimlRatio = (formData.get("aimlRatio") as string) || "4:5";
+    const openrouterRatio = (formData.get("openrouterRatio") as string) || "4:5";
 
     if (!file) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -34,12 +36,12 @@ export async function POST(request: NextRequest) {
     const base64 = buffer.toString("base64");
 
     const models = [
-      { provider: "aiml" as const, model: undefined, label: "AIML (Gemini 2.5 Flash)" },
-      { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash (OpenRouter)" },
+      { provider: "aiml" as const, model: undefined, label: "AIML (Gemini 2.5 Flash)", ratio: aimlRatio },
+      { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash (OpenRouter)", ratio: openrouterRatio },
     ];
 
     const results = await Promise.allSettled(
-      models.map((m) => generatePetPortrait(base64, file.type, style, m.provider, m.model))
+      models.map((m) => generatePetPortrait(base64, file.type, style, m.provider, m.model, m.ratio))
     );
 
     const output: ModelResult[] = results.map((result, i) => ({

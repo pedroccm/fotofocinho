@@ -25,7 +25,8 @@ export type Provider = "aiml" | "openrouter";
 async function generateWithAiml(
   imageBase64: string,
   mimeType: string,
-  prompt: string
+  prompt: string,
+  aspectRatio: string = "4:5"
 ): Promise<string> {
   if (!AIML_API_KEY) {
     throw new Error("AIML_API_KEY is not configured");
@@ -45,7 +46,7 @@ async function generateWithAiml(
       image_urls: [dataUrl],
       prompt: prompt,
       num_images: 1,
-      aspect_ratio: "4:5",
+      aspect_ratio: aspectRatio,
     }),
   });
 
@@ -75,7 +76,8 @@ async function generateWithOpenRouter(
   imageBase64: string,
   mimeType: string,
   prompt: string,
-  model: string = OPENROUTER_MODELS[0].id
+  model: string = OPENROUTER_MODELS[0].id,
+  aspectRatio: string = "4:5"
 ): Promise<string> {
   if (!OPENROUTER_API_KEY) {
     throw new Error("OPENROUTER_API_KEY is not configured");
@@ -93,7 +95,7 @@ async function generateWithOpenRouter(
     body: JSON.stringify({
       model,
       modalities: ["image", "text"],
-      image_config: { aspect_ratio: "4:5" },
+      image_config: { aspect_ratio: aspectRatio },
       messages: [
         {
           role: "user",
@@ -140,13 +142,14 @@ export async function generatePetPortrait(
   mimeType: string,
   style: string,
   provider: Provider = "aiml",
-  model?: string
+  model?: string,
+  aspectRatio: string = "4:5"
 ): Promise<string> {
   const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
   const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
 
   if (provider === "openrouter") {
-    return generateWithOpenRouter(imageBase64, mimeType, prompt, model || OPENROUTER_MODELS[0].id);
+    return generateWithOpenRouter(imageBase64, mimeType, prompt, model || OPENROUTER_MODELS[0].id, aspectRatio);
   }
-  return generateWithAiml(imageBase64, mimeType, prompt);
+  return generateWithAiml(imageBase64, mimeType, prompt, aspectRatio);
 }
