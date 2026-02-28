@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import ResultCheckoutFlow from "@/components/ResultCheckoutFlow";
 import { STYLES } from "@/lib/constants";
-import { OPENROUTER_MODELS } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 
@@ -13,8 +12,6 @@ export default function Home() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("renaissance");
-  const [provider, setProvider] = useState<"aiml" | "openrouter">("aiml");
-  const [openrouterModel, setOpenrouterModel] = useState("google/gemini-3.1-flash-image-preview");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
@@ -69,10 +66,6 @@ export default function Home() {
       const formData = new FormData();
       formData.append("image", uploadedFile);
       formData.append("style", selectedStyle);
-      formData.append("provider", provider);
-      if (provider === "openrouter") {
-        formData.append("model", openrouterModel);
-      }
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erro ao gerar retrato");
@@ -263,36 +256,6 @@ export default function Home() {
                       <span>{s.name}</span>
                     </button>
                   ))}
-                </div>
-                <div className="mt-6 flex items-center justify-center gap-3">
-                  <span className="text-xs text-[var(--text-muted)]">API:</span>
-                  <div className="flex bg-[var(--cream)] border border-[var(--sage-light)] rounded-full p-0.5">
-                    <button
-                      className={"px-3 py-1.5 rounded-full text-xs font-semibold transition-all " + (provider === "aiml" ? "bg-[var(--sage)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]")}
-                      onClick={(e) => { e.stopPropagation(); setProvider("aiml"); }}
-                    >
-                      AIML
-                    </button>
-                    <button
-                      className={"px-3 py-1.5 rounded-full text-xs font-semibold transition-all " + (provider === "openrouter" ? "bg-[var(--sage)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]")}
-                      onClick={(e) => { e.stopPropagation(); setProvider("openrouter"); }}
-                    >
-                      OpenRouter
-                    </button>
-                  </div>
-                  {provider === "openrouter" && (
-                    <div className="flex bg-[var(--cream)] border border-[var(--sage-light)] rounded-full p-0.5">
-                      {OPENROUTER_MODELS.map((m) => (
-                        <button
-                          key={m.id}
-                          className={"px-3 py-1.5 rounded-full text-xs font-semibold transition-all " + (openrouterModel === m.id ? "bg-[var(--terracotta)] text-white" : "text-[var(--text-muted)] hover:text-[var(--text)]")}
-                          onClick={(e) => { e.stopPropagation(); setOpenrouterModel(m.id); }}
-                        >
-                          {m.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
                 {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
                 <button

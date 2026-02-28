@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generatePetPortrait, type Provider } from "@/lib/gemini";
+import { generatePetPortrait } from "@/lib/gemini";
 import { applyWatermark } from "@/lib/watermark";
 import { supabaseAdmin } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
@@ -11,8 +11,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("image") as File | null;
     const style = (formData.get("style") as string) || "renaissance";
-    const provider = ((formData.get("provider") as string) || "aiml") as Provider;
-    const model = (formData.get("model") as string) || "";
 
     if (!file) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -63,10 +61,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Call AI API to generate portrait (passing base64 directly)
-    console.log(`Using provider: ${provider}`);
     let generatedBase64: string;
     try {
-      generatedBase64 = await generatePetPortrait(base64, file.type, style, provider, model);
+      generatedBase64 = await generatePetPortrait(base64, file.type, style);
     } catch (genError) {
       await supabaseAdmin
         .from("pets_generations")

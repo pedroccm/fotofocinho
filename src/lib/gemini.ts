@@ -45,6 +45,7 @@ async function generateWithAiml(
       image_urls: [dataUrl],
       prompt: prompt,
       num_images: 1,
+      aspect_ratio: "4:5",
     }),
   });
 
@@ -68,7 +69,6 @@ async function generateWithAiml(
 
 export const OPENROUTER_MODELS = [
   { id: "google/gemini-3.1-flash-image-preview", name: "Gemini 3.1 Flash" },
-  { id: "bytedance-seed/seed-2.0-mini", name: "Seed 2.0 Mini" },
 ] as const;
 
 async function generateWithOpenRouter(
@@ -93,6 +93,7 @@ async function generateWithOpenRouter(
     body: JSON.stringify({
       model,
       modalities: ["image", "text"],
+      image_config: { aspect_ratio: "4:5" },
       messages: [
         {
           role: "user",
