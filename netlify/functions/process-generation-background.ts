@@ -37,6 +37,7 @@ async function generateWithAiml(imageBase64: string, mimeType: string, prompt: s
       prompt,
       num_images: 1,
       aspect_ratio: "4:5",
+      response_format: "b64_json",
     }),
   });
 
