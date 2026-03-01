@@ -51,7 +51,6 @@ export default function ResultCheckoutFlow({
   const [pixData, setPixData] = useState<PixData | null>(null);
   const [copied, setCopied] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
 
   const [customer, setCustomer] = useState({
     name: "",
@@ -199,12 +198,11 @@ export default function ResultCheckoutFlow({
   const handleSelectProduct = (productId: string) => {
     const plan = PRICING.find((p) => p.id === productId);
     if (!plan) return;
-    const size = plan.sizes ? (selectedSizes[plan.id] || plan.sizes[0]) : undefined;
     setSelectedProduct({
       type: plan.id as ProductType,
       name: plan.name,
       price: plan.price,
-      size,
+      size: (plan as { size?: string }).size,
     });
     setCheckoutStep("customer-data");
     setError(null);
@@ -492,15 +490,7 @@ export default function ResultCheckoutFlow({
                         ? "border-2 border-[var(--terracotta)] bg-white"
                         : "border-2 border-transparent hover:border-[var(--sage-light)]"
                     }`}
-                    onClick={() => {
-                      const size = plan.sizes ? (selectedSizes[plan.id] || plan.sizes[0]) : undefined;
-                      setSelectedProduct({
-                        type: plan.id as ProductType,
-                        name: plan.name,
-                        price: plan.price,
-                        size,
-                      });
-                    }}
+                    onClick={() => handleSelectProduct(plan.id)}
                   >
                     {plan.badge && (
                       <span className="absolute -top-3 left-6 px-4 py-1 bg-[var(--terracotta)] text-white text-xs font-bold rounded-full">
@@ -515,21 +505,6 @@ export default function ResultCheckoutFlow({
                         <p className="text-sm text-[var(--text-muted)]">
                           {plan.features.join(" · ")}
                         </p>
-                        {plan.sizes && (
-                          <select
-                            value={selectedSizes[plan.id] || plan.sizes[0]}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              setSelectedSizes((prev) => ({ ...prev, [plan.id]: e.target.value }));
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="mt-2 px-3 py-1.5 rounded-lg border border-[var(--sage-light)] bg-white text-[var(--text)] text-sm outline-none cursor-pointer"
-                          >
-                            {plan.sizes.map((s) => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
-                        )}
                       </div>
                       <div className="flex items-center gap-4">
                         <span className={`font-[var(--font-fraunces)] text-[32px] font-semibold ${
