@@ -48,13 +48,25 @@ async function generateWithAiml(imageBase64: string, mimeType: string, prompt: s
 
   const result = await response.json();
 
-  if (result.data?.[0]?.url) {
-    const imageResponse = await fetch(result.data[0].url);
-    const imageBuffer = await imageResponse.arrayBuffer();
-    return Buffer.from(imageBuffer).toString("base64");
+  if (result.data?.[0]?.b64_json) {
+    return result.data[0].b64_json;
   }
 
-  throw new Error("No image generated in AIML response");
+  if (result.data?.[0]?.url) {
+    const imageUrl = result.data[0].url;
+    console.log(`Downloading generated image from: ${imageUrl.substring(0, 100)}...`);
+    const imageResponse = await fetch(imageUrl);
+    const contentType = imageResponse.headers.get("content-type") || "unknown";
+    console.log(`Image response: status=${imageResponse.status}, content-type=${contentType}, size=${imageResponse.headers.get("content-length")}`);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const rawBuffer = Buffer.from(imageBuffer);
+    console.log(`Raw buffer size: ${rawBuffer.length}, first bytes: ${rawBuffer.slice(0, 16).toString("hex")}`);
+    // Normalize to JPEG using sharp (API may return various formats)
+    const jpegBuffer = await sharp(rawBuffer).jpeg({ quality: 95 }).toBuffer();
+    return jpegBuffer.toString("base64");
+  }
+
+  throw new Error(`No image in AIML response. Keys: ${JSON.stringify(Object.keys(result.data?.[0] || {}))}`);
 }
 
 async function applyWatermark(imageBuffer: Buffer): Promise<Buffer> {
