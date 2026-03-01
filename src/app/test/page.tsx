@@ -16,22 +16,33 @@ const ASPECT_RATIOS = [
   { value: "16:9", label: "16:9", group: "L" },
 ];
 
+const MODELS = [
+  { id: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)" },
+  { id: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)" },
+  { id: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)" },
+];
+
 interface ModelResult {
   model: string;
   label: string;
   image: string | null;
   error: string | null;
+  cost: string | null;
+  balanceBefore: string | null;
+  balanceAfter: string | null;
+  status: "pending" | "generating" | "done" | "error";
 }
 
 export default function TestPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("renaissance");
-  const [nanoV1Ratio, setNanoV1Ratio] = useState("4:5");
-  const [nanoV2Ratio, setNanoV2Ratio] = useState("4:5");
-  const [nanoProRatio, setNanoProRatio] = useState("4:5");
+  const [ratios, setRatios] = useState<Record<string, string>>(
+    Object.fromEntries(MODELS.map((m) => [m.id, "4:5"]))
+  );
   const [isGenerating, setIsGenerating] = useState(false);
-  const [results, setResults] = useState<ModelResult[] | null>(null);
+  const [currentModel, setCurrentModel] = useState<number>(-1);
+  const [results, setResults] = useState<ModelResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +55,7 @@ export default function TestPage() {
       }
       setUploadedFile(file);
       setError(null);
-      setResults(null);
+      setResults([]);
       const reader = new FileReader();
       reader.onload = (e) => setUploadedPreview(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -65,40 +76,85 @@ export default function TestPage() {
     if (!uploadedFile) return;
     setIsGenerating(true);
     setError(null);
-    setResults(null);
-    try {
-      const formData = new FormData();
-      formData.append("image", uploadedFile);
-      formData.append("style", selectedStyle);
-      formData.append("nanoV1Ratio", nanoV1Ratio);
-      formData.append("nanoV2Ratio", nanoV2Ratio);
-      formData.append("nanoProRatio", nanoProRatio);
-      const res = await fetch("/api/test-generate", { method: "POST", body: formData });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Generation failed");
-      setResults(data.results);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Generation failed. Try again.");
-    } finally {
-      setIsGenerating(false);
+    // Init all results as pending
+    const initial: ModelResult[] = MODELS.map((m) => ({
+      model: m.id,
+      label: m.label,
+      image: null,
+      error: null,
+      cost: null,
+      balanceBefore: null,
+      balanceAfter: null,
+      status: "pending",
+    }));
+    setResults(initial);
+
+    for (let i = 0; i < MODELS.length; i++) {
+      setCurrentModel(i);
+
+      // Mark current as generating
+      setResults((prev) =>
+        prev.map((r, idx) => (idx === i ? { ...r, status: "generating" } : r))
+      );
+
+      try {
+        const formData = new FormData();
+        formData.append("image", uploadedFile);
+        formData.append("style", selectedStyle);
+        formData.append("model", MODELS[i].id);
+        formData.append("ratio", ratios[MODELS[i].id]);
+
+        const res = await fetch("/api/test-generate", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (!res.ok) {
+          setResults((prev) =>
+            prev.map((r, idx) =>
+              idx === i ? { ...r, status: "error", error: data.error || "Failed" } : r
+            )
+          );
+        } else {
+          setResults((prev) =>
+            prev.map((r, idx) =>
+              idx === i
+                ? {
+                    ...r,
+                    status: "done",
+                    image: data.image,
+                    cost: data.cost,
+                    balanceBefore: data.balanceBefore,
+                    balanceAfter: data.balanceAfter,
+                  }
+                : r
+            )
+          );
+        }
+      } catch (err) {
+        setResults((prev) =>
+          prev.map((r, idx) =>
+            idx === i
+              ? { ...r, status: "error", error: err instanceof Error ? err.message : "Failed" }
+              : r
+          )
+        );
+      }
     }
+
+    setCurrentModel(-1);
+    setIsGenerating(false);
   };
 
-  const placeholders: ModelResult[] = [
-    { model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", image: null, error: null },
-    { model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", image: null, error: null },
-    { model: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)", image: null, error: null },
-  ];
+  const totalCost = results
+    .filter((r) => r.cost && r.cost !== "N/A")
+    .reduce((sum, r) => sum + parseFloat(r.cost!), 0);
 
-  const displayResults = results || (isGenerating ? placeholders : null);
-
-  const RatioSelect = ({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) => (
+  const RatioSelect = ({ modelId, label }: { modelId: string; label: string }) => (
     <div className="flex items-center gap-2">
       <span className="text-xs font-semibold text-[var(--text-muted)] whitespace-nowrap">{label}</span>
       <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={ratios[modelId]}
+        onChange={(e) => setRatios((prev) => ({ ...prev, [modelId]: e.target.value }))}
         className="px-2.5 py-1.5 bg-[var(--cream)] border border-[var(--sage-light)] rounded-lg text-xs font-semibold text-[var(--earth)] cursor-pointer focus:outline-none focus:border-[var(--sage)]"
       >
         <optgroup label="Portrait">
@@ -139,7 +195,7 @@ export default function TestPage() {
             Model Comparison
           </h1>
           <p className="text-[15px] text-[var(--text-muted)] text-center mb-8">
-            Upload a pet photo and compare results from both AI providers side by side
+            Generates one model at a time and shows the cost per model
           </p>
 
           {/* Upload area */}
@@ -190,9 +246,9 @@ export default function TestPage() {
 
               {/* Aspect ratio selectors */}
               <div className="mt-5 flex flex-wrap gap-3 justify-center items-center">
-                <RatioSelect value={nanoV1Ratio} onChange={setNanoV1Ratio} label="V1:" />
-                <RatioSelect value={nanoV2Ratio} onChange={setNanoV2Ratio} label="V2:" />
-                <RatioSelect value={nanoProRatio} onChange={setNanoProRatio} label="Pro:" />
+                {MODELS.map((m) => (
+                  <RatioSelect key={m.id} modelId={m.id} label={m.label.split(" (")[0] + ":"} />
+                ))}
               </div>
 
               {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
@@ -205,37 +261,55 @@ export default function TestPage() {
                 {isGenerating ? (
                   <span className="flex items-center justify-center gap-3">
                     <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full inline-block animate-spin" />
-                    Generating with all 3 models...
+                    Generating model {currentModel + 1} of {MODELS.length}...
                   </span>
-                ) : "Generate with All 3 Models"}
+                ) : "Generate All 3 (Sequential)"}
               </button>
             </div>
           )}
         </div>
 
+        {/* Total cost banner */}
+        {results.length > 0 && results.some((r) => r.status === "done") && (
+          <div className="max-w-[1200px] mx-auto mb-6 p-4 bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 text-center">
+            <span className="text-sm text-[var(--text-muted)]">Total cost: </span>
+            <span className="text-lg font-bold text-[var(--earth)] font-mono">${totalCost.toFixed(4)}</span>
+            {results.some((r) => r.balanceAfter && r.balanceAfter !== "N/A") && (
+              <span className="text-sm text-[var(--text-muted)] ml-4">
+                Balance: <span className="font-mono font-semibold">${results.filter((r) => r.balanceAfter && r.balanceAfter !== "N/A").slice(-1)[0]?.balanceAfter}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Results Grid */}
-        {displayResults && (
+        {results.length > 0 && (
           <div className="grid md:grid-cols-3 gap-6 max-w-[1200px] mx-auto">
-            {displayResults.map((r, i) => (
+            {results.map((r, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 overflow-hidden">
                 {/* Model label */}
                 <div className="px-5 py-3 border-b border-[var(--sage-light)]/20 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
                     <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
-                      {[nanoV1Ratio, nanoV2Ratio, nanoProRatio][i]}
+                      {ratios[r.model]}
                     </span>
                   </div>
-                  {r.image && (
-                    <span className="w-2 h-2 rounded-full bg-green-500" />
-                  )}
-                  {r.error && (
-                    <span className="w-2 h-2 rounded-full bg-red-500" />
-                  )}
-                  {!r.image && !r.error && isGenerating && (
+                  {r.status === "done" && <span className="w-2 h-2 rounded-full bg-green-500" />}
+                  {r.status === "error" && <span className="w-2 h-2 rounded-full bg-red-500" />}
+                  {r.status === "generating" && (
                     <span className="w-4 h-4 border-2 border-[var(--sage-light)] border-t-[var(--sage)] rounded-full animate-spin" />
                   )}
+                  {r.status === "pending" && <span className="w-2 h-2 rounded-full bg-gray-300" />}
                 </div>
+
+                {/* Cost bar */}
+                {r.status === "done" && r.cost && (
+                  <div className="px-5 py-2 bg-[var(--sage)]/5 border-b border-[var(--sage-light)]/20 flex items-center justify-between">
+                    <span className="text-xs text-[var(--text-muted)]">Cost</span>
+                    <span className="text-sm font-bold font-mono text-[var(--earth)]">${r.cost}</span>
+                  </div>
+                )}
 
                 {/* Content */}
                 <div className="p-4 min-h-[300px] flex items-center justify-center">
@@ -253,10 +327,14 @@ export default function TestPage() {
                       <p className="text-sm text-red-500 font-medium">Failed</p>
                       <p className="text-xs text-[var(--text-muted)] mt-1">{r.error}</p>
                     </div>
-                  ) : (
+                  ) : r.status === "generating" ? (
                     <div className="text-center">
                       <div className="w-12 h-12 mx-auto mb-3 border-3 border-[var(--sage-light)] border-t-[var(--sage)] rounded-full animate-spin" />
                       <p className="text-sm text-[var(--text-muted)]">Generating...</p>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-sm text-[var(--text-muted)]">Waiting...</p>
                     </div>
                   )}
                 </div>

@@ -3,11 +3,18 @@ import { generatePetPortrait } from "@/lib/gemini";
 
 export const maxDuration = 120;
 
-interface ModelResult {
-  model: string;
-  label: string;
-  image: string | null;
-  error: string | null;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY!;
+
+async function getOpenRouterBalance(): Promise<number> {
+  const res = await fetch("https://openrouter.ai/api/v1/auth/key", {
+    headers: { Authorization: `Bearer ${OPENROUTER_API_KEY}` },
+  });
+  if (!res.ok) return -1;
+  const data = await res.json();
+  // data.data.limit and data.data.usage in USD
+  const limit = data.data?.limit ?? 0;
+  const usage = data.data?.usage ?? 0;
+  return limit - usage;
 }
 
 export async function POST(request: NextRequest) {
@@ -15,9 +22,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("image") as File | null;
     const style = (formData.get("style") as string) || "renaissance";
-    const nanoV1Ratio = (formData.get("nanoV1Ratio") as string) || "4:5";
-    const nanoV2Ratio = (formData.get("nanoV2Ratio") as string) || "4:5";
-    const nanoProRatio = (formData.get("nanoProRatio") as string) || "4:5";
+    const model = (formData.get("model") as string) || "";
+    const ratio = (formData.get("ratio") as string) || "4:5";
 
     if (!file) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -36,27 +42,26 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     const base64 = buffer.toString("base64");
 
-    const models = [
-      { provider: "openrouter" as const, model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", ratio: nanoV1Ratio },
-      { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", ratio: nanoV2Ratio },
-      { provider: "openrouter" as const, model: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)", ratio: nanoProRatio },
-    ];
+    // Check balance before
+    const balanceBefore = await getOpenRouterBalance();
 
-    const results = await Promise.allSettled(
-      models.map((m) => generatePetPortrait(base64, file.type, style, m.provider, m.model, m.ratio))
-    );
+    // Generate
+    const generatedBase64 = await generatePetPortrait(base64, file.type, style, "openrouter", model, ratio);
 
-    const output: ModelResult[] = results.map((result, i) => ({
-      model: models[i].model,
-      label: models[i].label,
-      image: result.status === "fulfilled" ? `data:image/jpeg;base64,${result.value}` : null,
-      error: result.status === "rejected" ? (result.reason?.message || "Unknown error") : null,
-    }));
+    // Check balance after
+    const balanceAfter = await getOpenRouterBalance();
 
-    return NextResponse.json({ results: output });
+    const cost = balanceBefore >= 0 && balanceAfter >= 0 ? balanceBefore - balanceAfter : -1;
+
+    return NextResponse.json({
+      image: `data:image/png;base64,${generatedBase64}`,
+      balanceBefore: balanceBefore >= 0 ? balanceBefore.toFixed(4) : "N/A",
+      balanceAfter: balanceAfter >= 0 ? balanceAfter.toFixed(4) : "N/A",
+      cost: cost >= 0 ? cost.toFixed(4) : "N/A",
+    });
   } catch (error) {
     console.error("Test generation error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: `Generation failed: ${message}` }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
