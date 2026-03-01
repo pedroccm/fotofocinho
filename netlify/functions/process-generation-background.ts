@@ -1,7 +1,8 @@
 import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
-const AIML_API_KEY = process.env.AIML_API_KEY!;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY!;
+const MODEL = "google/gemini-3.1-flash-image-preview";
 
 const BASE_PROMPT = `Formal portrait of a PET transformed into a noble figure from a classic gallery. The image must convey grandeur, serenity, and timelessness. The animal occupies a central position, seated or slightly in three-quarter view, with a direct or subtly averted gaze, evoking silent authority. The attire must dialogue with the chosen period (Renaissance, Baroque, or Victorian), with textile richness and refined ornamental detailing.
 
@@ -22,67 +23,58 @@ const STYLE_PROMPTS: Record<string, string> = {
     "Create an image representing a classic portrait of a PET in Victorian aesthetics, wearing a structured waistcoat, antique brooch, top hat or elegant bow. Velvet-upholstered armchair, library in the background. Soft and melancholic lighting, introspective aristocratic atmosphere.",
 };
 
-async function generateWithAiml(imageBase64: string, mimeType: string, prompt: string): Promise<Buffer> {
+async function generateWithOpenRouter(imageBase64: string, mimeType: string, prompt: string): Promise<Buffer> {
   const dataUrl = `data:${mimeType};base64,${imageBase64}`;
 
-  const response = await fetch("https://api.aimlapi.com/v1/images/generations", {
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${AIML_API_KEY}`,
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image-edit",
-      image_urls: [dataUrl],
-      prompt,
-      num_images: 1,
-      aspect_ratio: "4:5",
-      response_format: "b64_json",
+      model: MODEL,
+      modalities: ["image", "text"],
+      image_config: { aspect_ratio: "4:5" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: dataUrl } },
+          ],
+        },
+      ],
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`AIML API error: ${response.status} - ${errorText}`);
+    throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
   }
 
   const result = await response.json();
 
-  if (result.data?.[0]?.b64_json) {
-    return Buffer.from(result.data[0].b64_json, "base64");
+  // Format: choices[0].message.images[0].image_url.url (data URL)
+  const images = result.choices?.[0]?.message?.images;
+  if (images?.[0]?.image_url?.url) {
+    const imgUrl: string = images[0].image_url.url;
+    const b64 = imgUrl.replace(/^data:image\/\w+;base64,/, "");
+    return Buffer.from(b64, "base64");
   }
 
-  if (result.data?.[0]?.url) {
-    const imageUrl = result.data[0].url;
-    console.log(`Downloading generated image from URL (first 100 chars): ${imageUrl.substring(0, 100)}`);
-
-    // Retry up to 5 times with increasing delay (URL might not be ready immediately)
-    for (let attempt = 1; attempt <= 5; attempt++) {
-      try {
-        const imageResponse = await fetch(imageUrl, {
-          headers: { "Accept": "image/*,*/*" },
-        });
-        if (imageResponse.ok) {
-          const contentType = imageResponse.headers.get("content-type") || "unknown";
-          console.log(`Image download succeeded on attempt ${attempt}: content-type=${contentType}`);
-          const arrayBuf = await imageResponse.arrayBuffer();
-          return Buffer.from(arrayBuf);
-        }
-        console.log(`Image download attempt ${attempt} failed: ${imageResponse.status} ${imageResponse.statusText}`);
-        if (attempt < 5) {
-          await new Promise(r => setTimeout(r, attempt * 3000)); // 3s, 6s, 9s, 12s
-        }
-      } catch (fetchErr) {
-        console.log(`Image download attempt ${attempt} error: ${fetchErr}`);
-        if (attempt < 5) {
-          await new Promise(r => setTimeout(r, attempt * 3000));
-        }
+  // Fallback: content array with image parts
+  const content = result.choices?.[0]?.message?.content;
+  if (Array.isArray(content)) {
+    for (const part of content) {
+      if (part.type === "image_url" && part.image_url?.url) {
+        const b64 = part.image_url.url.replace(/^data:image\/\w+;base64,/, "");
+        return Buffer.from(b64, "base64");
       }
     }
-    throw new Error(`Image download failed after 5 attempts. URL: ${imageUrl.substring(0, 200)}`);
   }
 
-  throw new Error(`No image in AIML response. Keys: ${JSON.stringify(Object.keys(result.data?.[0] || {}))}`);
+  throw new Error(`No image in OpenRouter response. Keys: ${JSON.stringify(Object.keys(result.choices?.[0]?.message || {}))}`);
 }
 
 export const handler: Handler = async (event) => {
@@ -119,45 +111,36 @@ export const handler: Handler = async (event) => {
     const base64 = buffer.toString("base64");
     console.log(`Step 1 done. Image size: ${buffer.length} bytes`);
 
-    // 2. Generate portrait with AI
-    console.log("Step 2: Generating with AIML...");
+    // 2. Generate portrait with OpenRouter (returns base64 inline, no URL download needed)
+    console.log("Step 2: Generating with OpenRouter...");
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
     const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
-    const generatedBuffer = await generateWithAiml(base64, mimeType, prompt);
+    const generatedBuffer = await generateWithOpenRouter(base64, mimeType, prompt);
     console.log(`Step 2 done. Generated image size: ${generatedBuffer.length} bytes`);
 
     // Detect content type from magic bytes
     const isJpeg = generatedBuffer[0] === 0xFF && generatedBuffer[1] === 0xD8;
     const isPng = generatedBuffer[0] === 0x89 && generatedBuffer[1] === 0x50;
-    const isWebp = generatedBuffer[8] === 0x57 && generatedBuffer[9] === 0x45 && generatedBuffer[10] === 0x42 && generatedBuffer[11] === 0x50;
-    const detectedType = isJpeg ? "image/jpeg" : isPng ? "image/png" : isWebp ? "image/webp" : "image/jpeg";
-    const ext = isJpeg ? "jpg" : isPng ? "png" : isWebp ? "webp" : "jpg";
-    console.log(`Detected image format: ${detectedType} (first bytes: ${generatedBuffer.slice(0, 4).toString("hex")})`);
+    const detectedType = isJpeg ? "image/jpeg" : isPng ? "image/png" : "image/png";
+    const ext = isJpeg ? "jpg" : "png";
 
-    // 3. Upload clean version (the generated image as-is)
+    // 3. Upload clean version
     console.log("Step 3: Uploading clean version...");
     const generatedPath = `${generationId}/clean.${ext}`;
     const { error: uploadCleanErr } = await supabase.storage
       .from("generated")
       .upload(generatedPath, generatedBuffer, { contentType: detectedType, upsert: false });
     if (uploadCleanErr) throw new Error(`Step 3 failed - upload clean: ${uploadCleanErr.message}`);
-    console.log("Step 3 done.");
 
-    // 4. Upload the same image as watermarked preview for now
-    // (watermark will be applied client-side or via a separate service later)
-    console.log("Step 4: Uploading preview version...");
+    // 4. Upload same as preview (watermark to be added later)
+    console.log("Step 4: Uploading preview...");
     const watermarkedPath = `${generationId}/preview.${ext}`;
     const { error: uploadWmErr } = await supabase.storage
       .from("watermarked")
       .upload(watermarkedPath, generatedBuffer, { contentType: detectedType, upsert: false });
     if (uploadWmErr) throw new Error(`Step 4 failed - upload preview: ${uploadWmErr.message}`);
 
-    // 5. Get public URL
-    const { data: publicUrlData } = supabase.storage
-      .from("watermarked")
-      .getPublicUrl(watermarkedPath);
-
-    // 6. Update record
+    // 5. Update record
     await supabase
       .from("pets_generations")
       .update({
@@ -167,7 +150,7 @@ export const handler: Handler = async (event) => {
       })
       .eq("id", generationId);
 
-    console.log(`Generation ${generationId} completed: ${publicUrlData.publicUrl}`);
+    console.log(`Generation ${generationId} completed!`);
     return { statusCode: 200 };
   } catch (error) {
     const errorMessage = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
