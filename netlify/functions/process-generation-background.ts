@@ -1,6 +1,5 @@
 import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
-import sharp from "sharp";
 
 const AIML_API_KEY = process.env.AIML_API_KEY!;
 
@@ -23,7 +22,7 @@ const STYLE_PROMPTS: Record<string, string> = {
     "Create an image representing a classic portrait of a PET in Victorian aesthetics, wearing a structured waistcoat, antique brooch, top hat or elegant bow. Velvet-upholstered armchair, library in the background. Soft and melancholic lighting, introspective aristocratic atmosphere.",
 };
 
-async function generateWithAiml(imageBase64: string, mimeType: string, prompt: string): Promise<string> {
+async function generateWithAiml(imageBase64: string, mimeType: string, prompt: string): Promise<Buffer> {
   const dataUrl = `data:${mimeType};base64,${imageBase64}`;
 
   const response = await fetch("https://api.aimlapi.com/v1/images/generations", {
@@ -49,53 +48,23 @@ async function generateWithAiml(imageBase64: string, mimeType: string, prompt: s
   const result = await response.json();
 
   if (result.data?.[0]?.b64_json) {
-    return result.data[0].b64_json;
+    return Buffer.from(result.data[0].b64_json, "base64");
   }
 
   if (result.data?.[0]?.url) {
     const imageUrl = result.data[0].url;
-    console.log(`Downloading generated image from: ${imageUrl.substring(0, 100)}...`);
+    console.log(`Downloading generated image from URL (first 100 chars): ${imageUrl.substring(0, 100)}`);
     const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      throw new Error(`Image download failed: ${imageResponse.status} ${imageResponse.statusText}`);
+    }
     const contentType = imageResponse.headers.get("content-type") || "unknown";
-    console.log(`Image response: status=${imageResponse.status}, content-type=${contentType}, size=${imageResponse.headers.get("content-length")}`);
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const rawBuffer = Buffer.from(imageBuffer);
-    console.log(`Raw buffer size: ${rawBuffer.length}, first bytes: ${rawBuffer.slice(0, 16).toString("hex")}`);
-    // Normalize to JPEG using sharp (API may return various formats)
-    const jpegBuffer = await sharp(rawBuffer).jpeg({ quality: 95 }).toBuffer();
-    return jpegBuffer.toString("base64");
+    console.log(`Image download: content-type=${contentType}`);
+    const arrayBuf = await imageResponse.arrayBuffer();
+    return Buffer.from(arrayBuf);
   }
 
   throw new Error(`No image in AIML response. Keys: ${JSON.stringify(Object.keys(result.data?.[0] || {}))}`);
-}
-
-async function applyWatermark(imageBuffer: Buffer): Promise<Buffer> {
-  const image = sharp(imageBuffer);
-  const metadata = await image.metadata();
-  const width = metadata.width || 800;
-  const height = metadata.height || 1000;
-
-  const fontSize = Math.max(Math.round(width * 0.035), 14);
-  const text = "fotofocinho";
-  const spacing = fontSize * 12;
-
-  const lines: string[] = [];
-  for (let y = -spacing; y < height + spacing; y += spacing) {
-    for (let x = -spacing; x < width + spacing; x += spacing) {
-      lines.push(
-        `<text x="${x}" y="${y}" font-size="${fontSize}" font-family="Arial, sans-serif" font-weight="bold" fill="white" fill-opacity="0.25" transform="rotate(-30, ${x}, ${y})">${text}</text>`
-      );
-    }
-  }
-
-  const svgOverlay = Buffer.from(
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">${lines.join("")}</svg>`
-  );
-
-  return image
-    .composite([{ input: svgOverlay, top: 0, left: 0 }])
-    .jpeg({ quality: 90 })
-    .toBuffer();
 }
 
 export const handler: Handler = async (event) => {
@@ -104,8 +73,12 @@ export const handler: Handler = async (event) => {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  let generationId: string | undefined;
+
   try {
-    const { generationId, style, originalPath, mimeType } = JSON.parse(event.body || "{}");
+    const body = JSON.parse(event.body || "{}");
+    generationId = body.generationId;
+    const { style, originalPath, mimeType } = body;
 
     if (!generationId || !originalPath) {
       console.error("Missing required fields");
@@ -132,38 +105,41 @@ export const handler: Handler = async (event) => {
     console.log("Step 2: Generating with AIML...");
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
     const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
-    const generatedBase64 = await generateWithAiml(base64, mimeType, prompt);
-    const generatedBuffer = Buffer.from(generatedBase64, "base64");
+    const generatedBuffer = await generateWithAiml(base64, mimeType, prompt);
     console.log(`Step 2 done. Generated image size: ${generatedBuffer.length} bytes`);
 
-    // 3. Apply watermark
-    console.log("Step 3: Applying watermark...");
-    const watermarkedBuffer = await applyWatermark(generatedBuffer);
-    console.log(`Step 3 done. Watermarked size: ${watermarkedBuffer.length} bytes`);
+    // Detect content type from magic bytes
+    const isJpeg = generatedBuffer[0] === 0xFF && generatedBuffer[1] === 0xD8;
+    const isPng = generatedBuffer[0] === 0x89 && generatedBuffer[1] === 0x50;
+    const isWebp = generatedBuffer[8] === 0x57 && generatedBuffer[9] === 0x45 && generatedBuffer[10] === 0x42 && generatedBuffer[11] === 0x50;
+    const detectedType = isJpeg ? "image/jpeg" : isPng ? "image/png" : isWebp ? "image/webp" : "image/jpeg";
+    const ext = isJpeg ? "jpg" : isPng ? "png" : isWebp ? "webp" : "jpg";
+    console.log(`Detected image format: ${detectedType} (first bytes: ${generatedBuffer.slice(0, 4).toString("hex")})`);
 
-    // 4. Upload clean version
-    console.log("Step 4: Uploading clean version...");
-    const generatedPath = `${generationId}/clean.jpg`;
+    // 3. Upload clean version (the generated image as-is)
+    console.log("Step 3: Uploading clean version...");
+    const generatedPath = `${generationId}/clean.${ext}`;
     const { error: uploadCleanErr } = await supabase.storage
       .from("generated")
-      .upload(generatedPath, generatedBuffer, { contentType: "image/jpeg", upsert: false });
-    if (uploadCleanErr) throw new Error(`Step 4 failed - upload clean: ${uploadCleanErr.message}`);
-    console.log("Step 4 done.");
+      .upload(generatedPath, generatedBuffer, { contentType: detectedType, upsert: false });
+    if (uploadCleanErr) throw new Error(`Step 3 failed - upload clean: ${uploadCleanErr.message}`);
+    console.log("Step 3 done.");
 
-    // 5. Upload watermarked version
-    console.log("Step 5: Uploading watermarked version...");
-    const watermarkedPath = `${generationId}/preview.jpg`;
+    // 4. Upload the same image as watermarked preview for now
+    // (watermark will be applied client-side or via a separate service later)
+    console.log("Step 4: Uploading preview version...");
+    const watermarkedPath = `${generationId}/preview.${ext}`;
     const { error: uploadWmErr } = await supabase.storage
       .from("watermarked")
-      .upload(watermarkedPath, watermarkedBuffer, { contentType: "image/jpeg", upsert: false });
-    if (uploadWmErr) throw new Error(`Step 5 failed - upload watermarked: ${uploadWmErr.message}`);
+      .upload(watermarkedPath, generatedBuffer, { contentType: detectedType, upsert: false });
+    if (uploadWmErr) throw new Error(`Step 4 failed - upload preview: ${uploadWmErr.message}`);
 
-    // 6. Get public URL
+    // 5. Get public URL
     const { data: publicUrlData } = supabase.storage
       .from("watermarked")
       .getPublicUrl(watermarkedPath);
 
-    // 7. Update record
+    // 6. Update record
     await supabase
       .from("pets_generations")
       .update({
@@ -179,9 +155,7 @@ export const handler: Handler = async (event) => {
     const errorMessage = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
     console.error("Background generation error:", errorMessage);
 
-    // Try to update the record status to failed with error details
     try {
-      const { generationId } = JSON.parse(event.body || "{}");
       if (generationId) {
         await supabase
           .from("pets_generations")
