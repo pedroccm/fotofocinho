@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from("pets_generations")
-    .select("id, status, watermarked_image_path")
+    .select("id, status, watermarked_image_path, error_message")
     .eq("id", id)
     .single();
 
@@ -27,6 +27,10 @@ export async function GET(request: NextRequest) {
       status: "completed",
       watermarkedImage: publicUrlData.publicUrl,
     });
+  }
+
+  if (data.status === "failed") {
+    return NextResponse.json({ status: "failed", error: data.error_message || "Unknown error" });
   }
 
   return NextResponse.json({ status: data.status });

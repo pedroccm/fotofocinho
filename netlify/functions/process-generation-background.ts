@@ -103,37 +103,48 @@ export const handler: Handler = async (event) => {
     console.log(`Processing generation ${generationId}...`);
 
     // 1. Download original from Supabase Storage
+    console.log("Step 1: Downloading original...");
     const { data: fileData, error: downloadError } = await supabase.storage
       .from("originals")
       .download(originalPath);
 
     if (downloadError || !fileData) {
-      throw new Error(`Failed to download original: ${downloadError?.message}`);
+      throw new Error(`Step 1 failed - download original: ${downloadError?.message}`);
     }
 
     const buffer = Buffer.from(await fileData.arrayBuffer());
     const base64 = buffer.toString("base64");
+    console.log(`Step 1 done. Image size: ${buffer.length} bytes`);
 
     // 2. Generate portrait with AI
+    console.log("Step 2: Generating with AIML...");
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
     const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
     const generatedBase64 = await generateWithAiml(base64, mimeType, prompt);
     const generatedBuffer = Buffer.from(generatedBase64, "base64");
+    console.log(`Step 2 done. Generated image size: ${generatedBuffer.length} bytes`);
 
     // 3. Apply watermark
+    console.log("Step 3: Applying watermark...");
     const watermarkedBuffer = await applyWatermark(generatedBuffer);
+    console.log(`Step 3 done. Watermarked size: ${watermarkedBuffer.length} bytes`);
 
     // 4. Upload clean version
+    console.log("Step 4: Uploading clean version...");
     const generatedPath = `${generationId}/clean.jpg`;
-    await supabase.storage
+    const { error: uploadCleanErr } = await supabase.storage
       .from("generated")
       .upload(generatedPath, generatedBuffer, { contentType: "image/jpeg", upsert: false });
+    if (uploadCleanErr) throw new Error(`Step 4 failed - upload clean: ${uploadCleanErr.message}`);
+    console.log("Step 4 done.");
 
     // 5. Upload watermarked version
+    console.log("Step 5: Uploading watermarked version...");
     const watermarkedPath = `${generationId}/preview.jpg`;
-    await supabase.storage
+    const { error: uploadWmErr } = await supabase.storage
       .from("watermarked")
       .upload(watermarkedPath, watermarkedBuffer, { contentType: "image/jpeg", upsert: false });
+    if (uploadWmErr) throw new Error(`Step 5 failed - upload watermarked: ${uploadWmErr.message}`);
 
     // 6. Get public URL
     const { data: publicUrlData } = supabase.storage
@@ -153,18 +164,21 @@ export const handler: Handler = async (event) => {
     console.log(`Generation ${generationId} completed: ${publicUrlData.publicUrl}`);
     return { statusCode: 200 };
   } catch (error) {
-    console.error("Background generation error:", error);
+    const errorMessage = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
+    console.error("Background generation error:", errorMessage);
 
-    // Try to update the record status to failed
+    // Try to update the record status to failed with error details
     try {
       const { generationId } = JSON.parse(event.body || "{}");
       if (generationId) {
         await supabase
           .from("pets_generations")
-          .update({ status: "failed" })
+          .update({ status: "failed", error_message: errorMessage.substring(0, 1000) })
           .eq("id", generationId);
       }
-    } catch {}
+    } catch (updateErr) {
+      console.error("Failed to update error status:", updateErr);
+    }
 
     return { statusCode: 500 };
   }
