@@ -1,13 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import { generatePetPortrait } from "@/lib/gemini";
 import { applyWatermark } from "@/lib/watermark";
 import { supabaseAdmin } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
 
+const ANON_LIMIT = 1;
+const AUTH_LIMIT = 3;
+
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
+    // Extract IP address
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    // Try to get authenticated user
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll() {},
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Check generation limits
+    if (user) {
+      const { count } = await supabaseAdmin
+        .from("pets_generations")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .eq("status", "completed");
+
+      if ((count ?? 0) >= AUTH_LIMIT) {
+        return NextResponse.json(
+          { error: "LIMIT_REACHED", message: "Você atingiu o limite de 3 retratos gratuitos!" },
+          { status: 429 }
+        );
+      }
+    } else {
+      const { count } = await supabaseAdmin
+        .from("pets_generations")
+        .select("*", { count: "exact", head: true })
+        .eq("ip_address", ip)
+        .is("user_id", null)
+        .eq("status", "completed");
+
+      if ((count ?? 0) >= ANON_LIMIT) {
+        return NextResponse.json(
+          { error: "ANON_LIMIT_REACHED", message: "Crie uma conta para continuar gerando!" },
+          { status: 429 }
+        );
+      }
+    }
+
     const formData = await request.formData();
     const file = formData.get("image") as File | null;
     const style = (formData.get("style") as string) || "renaissance";
@@ -53,6 +109,8 @@ export async function POST(request: NextRequest) {
         style,
         original_image_path: originalPath,
         status: "generating",
+        user_id: user?.id || null,
+        ip_address: ip,
       });
 
     if (insertError) {

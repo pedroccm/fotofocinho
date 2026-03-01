@@ -19,6 +19,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -60,6 +62,14 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!uploadedFile) return;
+
+    // Client-side limit check: anonymous user who already generated
+    const hasGenerated = localStorage.getItem("ff_generated");
+    if (hasGenerated && !user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     setIsGenerating(true);
     setError(null);
     try {
@@ -68,9 +78,21 @@ export default function Home() {
       formData.append("style", selectedStyle);
       const res = await fetch("/api/generate", { method: "POST", body: formData });
       const data = await res.json();
+
+      if (res.status === 429) {
+        if (data.error === "ANON_LIMIT_REACHED") {
+          setShowLoginModal(true);
+        } else if (data.error === "LIMIT_REACHED") {
+          setShowLimitModal(true);
+        }
+        return;
+      }
+
       if (!res.ok) throw new Error(data.error || "Erro ao gerar retrato");
+
       setGeneratedImage(data.watermarkedImage);
       setGenerationId(data.generationId);
+      localStorage.setItem("ff_generated", "true");
       // Scroll to result section
       setTimeout(() => {
         document.getElementById("result")?.scrollIntoView({ behavior: "smooth" });
@@ -371,6 +393,103 @@ export default function Home() {
           <p className="text-sm text-[var(--text-muted)]">{new Date().getFullYear()} Fotofocinho. Feito com amor para pets.</p>
         </footer>
       </div>
+
+      {/* Login Modal - shown when anonymous user hits limit */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowLoginModal(false)} />
+          <div className="relative bg-[var(--cream)] rounded-3xl p-8 max-w-[420px] w-full shadow-[0_24px_64px_rgba(0,0,0,0.15)]">
+            <button
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+              aria-label="Close"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--earth)" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--sage)]/10 rounded-full">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--sage)" strokeWidth="1.5">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <h3 className="font-[var(--font-fraunces)] text-[24px] font-semibold text-[var(--earth)] mb-2">
+                Crie uma conta para continuar gerando!
+              </h3>
+              <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">
+                Usuários cadastrados podem gerar até <strong>3 retratos gratuitos</strong>. Crie sua conta em segundos!
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link
+                  href="/register"
+                  className="w-full py-3.5 rounded-full bg-[var(--terracotta)] text-white text-[15px] font-bold text-center transition-all hover:-translate-y-0.5 hover:bg-[var(--terracotta-dark)] hover:shadow-[0_8px_24px_rgba(193,127,89,0.3)]"
+                >
+                  Criar conta
+                </Link>
+                <Link
+                  href="/login"
+                  className="w-full py-3.5 rounded-full border-2 border-[var(--sage)] text-[var(--sage-dark)] text-[15px] font-bold text-center transition-all hover:-translate-y-0.5 hover:bg-[var(--sage)] hover:text-white"
+                >
+                  Já tenho conta
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Limit Reached Modal - shown when logged user hits 3 generations */}
+      {showLimitModal && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowLimitModal(false)} />
+          <div className="relative bg-[var(--cream)] rounded-3xl p-8 max-w-[420px] w-full shadow-[0_24px_64px_rgba(0,0,0,0.15)]">
+            <button
+              onClick={() => setShowLimitModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+              aria-label="Close"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--earth)" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--terracotta)]/10 rounded-full">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" strokeWidth="1.5">
+                  <path d="M12 9v4M12 17h.01" />
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                </svg>
+              </div>
+              <h3 className="font-[var(--font-fraunces)] text-[24px] font-semibold text-[var(--earth)] mb-2">
+                Você atingiu o limite de 3 retratos gratuitos!
+              </h3>
+              <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">
+                Quer gerar mais retratos? Fale com a gente pelo WhatsApp e descubra nossos planos especiais.
+              </p>
+              <a
+                href="https://wa.me/5519991289630"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 w-full py-3.5 rounded-full bg-[#25D366] text-white text-[15px] font-bold transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(37,211,102,0.3)]"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Falar no WhatsApp
+              </a>
+              <button
+                onClick={() => setShowLimitModal(false)}
+                className="mt-3 w-full py-3 text-sm text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @keyframes morph {

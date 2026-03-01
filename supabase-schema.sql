@@ -31,12 +31,16 @@ CREATE TABLE pets_generations (
   original_image_path TEXT NOT NULL,  -- path in Supabase Storage
   generated_image_path TEXT,          -- clean version (no watermark)
   watermarked_image_path TEXT,        -- preview version (with watermark)
+  user_id UUID REFERENCES auth.users(id),  -- authenticated user (NULL for anonymous)
+  ip_address TEXT,                         -- client IP for anonymous rate limiting
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'generating', 'completed', 'failed')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX idx_pets_generations_status ON pets_generations(status);
+CREATE INDEX idx_pets_generations_user_id ON pets_generations(user_id);
+CREATE INDEX idx_pets_generations_ip ON pets_generations(ip_address);
 
 -- ============================================
 -- 3. ORDERS TABLE
