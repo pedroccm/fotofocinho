@@ -27,8 +27,8 @@ export default function TestPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("renaissance");
-  const [aimlRatio, setAimlRatio] = useState("4:5");
-  const [openrouterRatio, setOpenrouterRatio] = useState("4:5");
+  const [nanoV1Ratio, setNanoV1Ratio] = useState("4:5");
+  const [nanoV2Ratio, setNanoV2Ratio] = useState("4:5");
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<ModelResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,8 +69,8 @@ export default function TestPage() {
       const formData = new FormData();
       formData.append("image", uploadedFile);
       formData.append("style", selectedStyle);
-      formData.append("aimlRatio", aimlRatio);
-      formData.append("openrouterRatio", openrouterRatio);
+      formData.append("nanoV1Ratio", nanoV1Ratio);
+      formData.append("nanoV2Ratio", nanoV2Ratio);
       const res = await fetch("/api/test-generate", { method: "POST", body: formData });
 
       const data = await res.json();
@@ -84,8 +84,8 @@ export default function TestPage() {
   };
 
   const placeholders: ModelResult[] = [
-    { model: "aiml", label: "AIML (Gemini 2.5 Flash)", image: null, error: null },
-    { model: "google/gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash (OpenRouter)", image: null, error: null },
+    { model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", image: null, error: null },
+    { model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", image: null, error: null },
   ];
 
   const displayResults = results || (isGenerating ? placeholders : null);
@@ -187,8 +187,8 @@ export default function TestPage() {
 
               {/* Aspect ratio selectors */}
               <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <RatioSelect value={aimlRatio} onChange={setAimlRatio} label="AIML:" />
-                <RatioSelect value={openrouterRatio} onChange={setOpenrouterRatio} label="OpenRouter:" />
+                <RatioSelect value={nanoV1Ratio} onChange={setNanoV1Ratio} label="Nano V1:" />
+                <RatioSelect value={nanoV2Ratio} onChange={setNanoV2Ratio} label="Nano V2:" />
               </div>
 
               {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
@@ -219,7 +219,7 @@ export default function TestPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
                     <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
-                      {i === 0 ? aimlRatio : openrouterRatio}
+                      {i === 0 ? nanoV1Ratio : nanoV2Ratio}
                     </span>
                   </div>
                   {r.image && (

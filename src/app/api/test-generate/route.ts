@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("image") as File | null;
     const style = (formData.get("style") as string) || "renaissance";
-    const aimlRatio = (formData.get("aimlRatio") as string) || "4:5";
-    const openrouterRatio = (formData.get("openrouterRatio") as string) || "4:5";
+    const nanoV1Ratio = (formData.get("nanoV1Ratio") as string) || "4:5";
+    const nanoV2Ratio = (formData.get("nanoV2Ratio") as string) || "4:5";
 
     if (!file) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     const base64 = buffer.toString("base64");
 
     const models = [
-      { provider: "aiml" as const, model: undefined, label: "AIML (Gemini 2.5 Flash)", ratio: aimlRatio },
-      { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash (OpenRouter)", ratio: openrouterRatio },
+      { provider: "openrouter" as const, model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", ratio: nanoV1Ratio },
+      { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", ratio: nanoV2Ratio },
     ];
 
     const results = await Promise.allSettled(
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     );
 
     const output: ModelResult[] = results.map((result, i) => ({
-      model: models[i].model || "aiml",
+      model: models[i].model,
       label: models[i].label,
       image: result.status === "fulfilled" ? `data:image/jpeg;base64,${result.value}` : null,
       error: result.status === "rejected" ? (result.reason?.message || "Unknown error") : null,
