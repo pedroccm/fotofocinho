@@ -55,14 +55,31 @@ async function generateWithAiml(imageBase64: string, mimeType: string, prompt: s
   if (result.data?.[0]?.url) {
     const imageUrl = result.data[0].url;
     console.log(`Downloading generated image from URL (first 100 chars): ${imageUrl.substring(0, 100)}`);
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      throw new Error(`Image download failed: ${imageResponse.status} ${imageResponse.statusText}`);
+
+    // Retry up to 5 times with increasing delay (URL might not be ready immediately)
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      try {
+        const imageResponse = await fetch(imageUrl, {
+          headers: { "Accept": "image/*,*/*" },
+        });
+        if (imageResponse.ok) {
+          const contentType = imageResponse.headers.get("content-type") || "unknown";
+          console.log(`Image download succeeded on attempt ${attempt}: content-type=${contentType}`);
+          const arrayBuf = await imageResponse.arrayBuffer();
+          return Buffer.from(arrayBuf);
+        }
+        console.log(`Image download attempt ${attempt} failed: ${imageResponse.status} ${imageResponse.statusText}`);
+        if (attempt < 5) {
+          await new Promise(r => setTimeout(r, attempt * 3000)); // 3s, 6s, 9s, 12s
+        }
+      } catch (fetchErr) {
+        console.log(`Image download attempt ${attempt} error: ${fetchErr}`);
+        if (attempt < 5) {
+          await new Promise(r => setTimeout(r, attempt * 3000));
+        }
+      }
     }
-    const contentType = imageResponse.headers.get("content-type") || "unknown";
-    console.log(`Image download: content-type=${contentType}`);
-    const arrayBuf = await imageResponse.arrayBuffer();
-    return Buffer.from(arrayBuf);
+    throw new Error(`Image download failed after 5 attempts. URL: ${imageUrl.substring(0, 200)}`);
   }
 
   throw new Error(`No image in AIML response. Keys: ${JSON.stringify(Object.keys(result.data?.[0] || {}))}`);
