@@ -29,6 +29,7 @@ export default function TestPage() {
   const [selectedStyle, setSelectedStyle] = useState("renaissance");
   const [nanoV1Ratio, setNanoV1Ratio] = useState("4:5");
   const [nanoV2Ratio, setNanoV2Ratio] = useState("4:5");
+  const [nanoProRatio, setNanoProRatio] = useState("4:5");
   const [isGenerating, setIsGenerating] = useState(false);
   const [results, setResults] = useState<ModelResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +72,7 @@ export default function TestPage() {
       formData.append("style", selectedStyle);
       formData.append("nanoV1Ratio", nanoV1Ratio);
       formData.append("nanoV2Ratio", nanoV2Ratio);
+      formData.append("nanoProRatio", nanoProRatio);
       const res = await fetch("/api/test-generate", { method: "POST", body: formData });
 
       const data = await res.json();
@@ -86,6 +88,7 @@ export default function TestPage() {
   const placeholders: ModelResult[] = [
     { model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", image: null, error: null },
     { model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", image: null, error: null },
+    { model: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)", image: null, error: null },
   ];
 
   const displayResults = results || (isGenerating ? placeholders : null);
@@ -186,9 +189,10 @@ export default function TestPage() {
               </div>
 
               {/* Aspect ratio selectors */}
-              <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <RatioSelect value={nanoV1Ratio} onChange={setNanoV1Ratio} label="Nano V1:" />
-                <RatioSelect value={nanoV2Ratio} onChange={setNanoV2Ratio} label="Nano V2:" />
+              <div className="mt-5 flex flex-wrap gap-3 justify-center items-center">
+                <RatioSelect value={nanoV1Ratio} onChange={setNanoV1Ratio} label="V1:" />
+                <RatioSelect value={nanoV2Ratio} onChange={setNanoV2Ratio} label="V2:" />
+                <RatioSelect value={nanoProRatio} onChange={setNanoProRatio} label="Pro:" />
               </div>
 
               {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
@@ -201,9 +205,9 @@ export default function TestPage() {
                 {isGenerating ? (
                   <span className="flex items-center justify-center gap-3">
                     <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full inline-block animate-spin" />
-                    Generating with both models...
+                    Generating with all 3 models...
                   </span>
-                ) : "Generate with Both Models"}
+                ) : "Generate with All 3 Models"}
               </button>
             </div>
           )}
@@ -211,7 +215,7 @@ export default function TestPage() {
 
         {/* Results Grid */}
         {displayResults && (
-          <div className="grid md:grid-cols-2 gap-6 max-w-[900px] mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-[1200px] mx-auto">
             {displayResults.map((r, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 overflow-hidden">
                 {/* Model label */}
@@ -219,7 +223,7 @@ export default function TestPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
                     <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
-                      {i === 0 ? nanoV1Ratio : nanoV2Ratio}
+                      {[nanoV1Ratio, nanoV2Ratio, nanoProRatio][i]}
                     </span>
                   </div>
                   {r.image && (

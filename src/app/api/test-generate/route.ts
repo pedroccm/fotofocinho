@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     const style = (formData.get("style") as string) || "renaissance";
     const nanoV1Ratio = (formData.get("nanoV1Ratio") as string) || "4:5";
     const nanoV2Ratio = (formData.get("nanoV2Ratio") as string) || "4:5";
+    const nanoProRatio = (formData.get("nanoProRatio") as string) || "4:5";
 
     if (!file) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
     const models = [
       { provider: "openrouter" as const, model: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)", ratio: nanoV1Ratio },
       { provider: "openrouter" as const, model: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)", ratio: nanoV2Ratio },
+      { provider: "openrouter" as const, model: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)", ratio: nanoProRatio },
     ];
 
     const results = await Promise.allSettled(
