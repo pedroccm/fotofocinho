@@ -77,10 +77,9 @@ export default function Home() {
       formData.append("image", uploadedFile);
       formData.append("style", selectedStyle);
       const res = await fetch("/api/generate", { method: "POST", body: formData });
+      const data = await res.json();
 
-      // Limit errors still come as JSON (non-streaming)
       if (res.status === 429) {
-        const data = await res.json();
         if (data.error === "ANON_LIMIT_REACHED") {
           setShowLoginModal(true);
         } else if (data.error === "LIMIT_REACHED") {
@@ -89,42 +88,32 @@ export default function Home() {
         return;
       }
 
-      if (!res.ok && res.headers.get("content-type")?.includes("application/json")) {
-        const data = await res.json();
-        throw new Error(data.error || "Erro ao gerar retrato");
-      }
+      if (!res.ok) throw new Error(data.error || "Erro ao gerar retrato");
 
-      // Read SSE stream
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("Erro de conexão");
+      // Poll for completion (background function is processing)
+      const genId = data.generationId;
+      const maxAttempts = 120; // 120 * 3s = 6 minutes max
+      for (let i = 0; i < maxAttempts; i++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        const check = await fetch(`/api/check-generation?id=${genId}`);
+        const status = await check.json();
 
-      const decoder = new TextDecoder();
-      let buffer = "";
+        if (status.status === "completed") {
+          setGeneratedImage(status.watermarkedImage);
+          setGenerationId(genId);
+          localStorage.setItem("ff_generated", "true");
+          setTimeout(() => {
+            document.getElementById("result")?.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+          return;
+        }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const event = JSON.parse(line.slice(6));
-
-          if (event.status === "completed" && event.success) {
-            setGeneratedImage(event.watermarkedImage);
-            setGenerationId(event.generationId);
-            localStorage.setItem("ff_generated", "true");
-            setTimeout(() => {
-              document.getElementById("result")?.scrollIntoView({ behavior: "smooth" });
-            }, 100);
-          } else if (event.status === "error") {
-            throw new Error(event.error || "Erro ao gerar retrato");
-          }
+        if (status.status === "failed") {
+          throw new Error("Falha ao gerar retrato. Tente novamente.");
         }
       }
+
+      throw new Error("Tempo limite excedido. Tente novamente.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao gerar retrato. Tente novamente.");
     } finally {

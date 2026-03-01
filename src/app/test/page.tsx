@@ -73,37 +73,9 @@ export default function TestPage() {
       formData.append("openrouterRatio", openrouterRatio);
       const res = await fetch("/api/test-generate", { method: "POST", body: formData });
 
-      if (!res.ok && res.headers.get("content-type")?.includes("application/json")) {
-        const data = await res.json();
-        throw new Error(data.error || "Generation failed");
-      }
-
-      // Read SSE stream
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("Connection error");
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const event = JSON.parse(line.slice(6));
-
-          if (event.status === "completed") {
-            setResults(event.results);
-          } else if (event.status === "error") {
-            throw new Error(event.error || "Generation failed");
-          }
-        }
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Generation failed");
+      setResults(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Generation failed. Try again.");
     } finally {
