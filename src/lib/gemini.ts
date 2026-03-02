@@ -72,13 +72,18 @@ export const OPENROUTER_MODELS = [
   { id: "google/gemini-3.1-flash-image-preview", name: "Gemini 3.1 Flash" },
 ] as const;
 
+export interface OpenRouterResult {
+  image: string;
+  generationId: string | null;
+}
+
 async function generateWithOpenRouter(
   imageBase64: string,
   mimeType: string,
   prompt: string,
   model: string = OPENROUTER_MODELS[0].id,
   aspectRatio: string = "4:5"
-): Promise<string> {
+): Promise<OpenRouterResult> {
   if (!OPENROUTER_API_KEY) {
     throw new Error("OPENROUTER_API_KEY is not configured");
   }
@@ -117,11 +122,13 @@ async function generateWithOpenRouter(
   const result = await response.json();
   console.log("OpenRouter response:", JSON.stringify(result, null, 2));
 
+  const generationId: string | null = result.id || null;
+
   // Format: choices[0].message.images[0].image_url.url
   const images = result.choices?.[0]?.message?.images;
   if (images?.[0]?.image_url?.url) {
     const imgUrl: string = images[0].image_url.url;
-    return imgUrl.replace(/^data:image\/\w+;base64,/, "");
+    return { image: imgUrl.replace(/^data:image\/\w+;base64,/, ""), generationId };
   }
 
   // Fallback: content array with image parts
@@ -129,7 +136,7 @@ async function generateWithOpenRouter(
   if (Array.isArray(content)) {
     for (const part of content) {
       if (part.type === "image_url" && part.image_url?.url) {
-        return part.image_url.url.replace(/^data:image\/\w+;base64,/, "");
+        return { image: part.image_url.url.replace(/^data:image\/\w+;base64,/, ""), generationId };
       }
     }
   }
@@ -144,12 +151,13 @@ export async function generatePetPortrait(
   provider: Provider = "aiml",
   model?: string,
   aspectRatio: string = "4:5"
-): Promise<string> {
+): Promise<OpenRouterResult> {
   const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.renaissance;
   const prompt = `${stylePrompt}\n\n${BASE_PROMPT}`;
 
   if (provider === "openrouter") {
     return generateWithOpenRouter(imageBase64, mimeType, prompt, model || OPENROUTER_MODELS[0].id, aspectRatio);
   }
-  return generateWithAiml(imageBase64, mimeType, prompt, aspectRatio);
+  const image = await generateWithAiml(imageBase64, mimeType, prompt, aspectRatio);
+  return { image, generationId: null };
 }

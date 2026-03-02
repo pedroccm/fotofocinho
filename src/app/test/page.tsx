@@ -28,6 +28,9 @@ interface ModelResult {
   image: string | null;
   error: string | null;
   cost: string | null;
+  tokensPrompt: string | null;
+  tokensCompletion: string | null;
+  generationId: string | null;
   status: "idle" | "generating" | "done" | "error";
 }
 
@@ -45,6 +48,9 @@ export default function TestPage() {
       image: null,
       error: null,
       cost: null,
+      tokensPrompt: null,
+      tokensCompletion: null,
+      generationId: null,
       status: "idle",
     }))
   );
@@ -60,14 +66,18 @@ export default function TestPage() {
       }
       setUploadedFile(file);
       // Reset results when new file uploaded
-      setResults(MODELS.map((m) => ({
-        model: m.id,
-        label: m.label,
-        image: null,
-        error: null,
-        cost: null,
-        status: "idle",
-      }));
+      setResults(
+        MODELS.map((m) => ({
+          model: m.id,
+          label: m.label,
+          image: null,
+          error: null,
+          cost: null,
+          balanceBefore: null,
+          balanceAfter: null,
+          status: "idle",
+        }))
+      );
       const reader = new FileReader();
       reader.onload = (e) => setUploadedPreview(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -123,6 +133,9 @@ export default function TestPage() {
                   status: "done",
                   image: data.image,
                   cost: data.cost,
+                  tokensPrompt: data.tokensPrompt,
+                  tokensCompletion: data.tokensCompletion,
+                  generationId: data.generationId,
                 }
               : r
           )
@@ -285,12 +298,26 @@ export default function TestPage() {
                   {r.status === "done" && r.image && (
                     <div className="w-full">
                       <img src={r.image} alt={r.label} className="w-full h-auto rounded-lg mb-2" />
-                      {r.cost && (
-                        <div className="flex items-center justify-center gap-2 text-sm">
+                      <div className="bg-[var(--sand)] rounded-lg p-3 text-xs font-mono space-y-1">
+                        <div className="flex justify-between">
                           <span className="text-[var(--text-muted)]">Cost:</span>
-                          <span className="font-bold font-mono text-[var(--earth)]">${r.cost}</span>
+                          <span className={"font-bold " + (r.cost === "$0.000000" ? "text-red-500" : "text-green-700")}>{r.cost ?? "N/A"}</span>
                         </div>
-                      )}
+                        <div className="flex justify-between">
+                          <span className="text-[var(--text-muted)]">Tokens In:</span>
+                          <span className="text-[var(--earth)] font-bold">{r.tokensPrompt ?? "N/A"}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[var(--text-muted)]">Tokens Out:</span>
+                          <span className="text-[var(--earth)] font-bold">{r.tokensCompletion ?? "N/A"}</span>
+                        </div>
+                        {r.generationId && (
+                          <div className="flex justify-between border-t border-[var(--sage-light)]/30 pt-1">
+                            <span className="text-[var(--text-muted)]">ID:</span>
+                            <span className="text-[var(--earth)] truncate ml-2">{r.generationId}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
