@@ -17,7 +17,7 @@ const ASPECT_RATIOS = [
 ];
 
 const MODELS = [
-  { id: "google/gemini-2.5-flash-image-preview", label: "Nano Banana (2.5 Flash)" },
+  { id: "google/gemini-2.5-flash-image", label: "Nano Banana (2.5 Flash)" },
   { id: "google/gemini-3.1-flash-image-preview", label: "Nano Banana 2 (3.1 Flash)" },
   { id: "google/gemini-3-pro-image-preview", label: "Nano Banana Pro (3 Pro)" },
 ];
