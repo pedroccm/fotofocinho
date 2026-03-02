@@ -73,8 +73,9 @@ export default function TestPage() {
           image: null,
           error: null,
           cost: null,
-          balanceBefore: null,
-          balanceAfter: null,
+          tokensPrompt: null,
+          tokensCompletion: null,
+          generationId: null,
           status: "idle",
         }))
       );
