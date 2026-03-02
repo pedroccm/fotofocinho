@@ -28,9 +28,7 @@ interface ModelResult {
   image: string | null;
   error: string | null;
   cost: string | null;
-  balanceBefore: string | null;
-  balanceAfter: string | null;
-  status: "pending" | "generating" | "done" | "error";
+  status: "idle" | "generating" | "done" | "error";
 }
 
 export default function TestPage() {
@@ -40,22 +38,36 @@ export default function TestPage() {
   const [ratios, setRatios] = useState<Record<string, string>>(
     Object.fromEntries(MODELS.map((m) => [m.id, "4:5"]))
   );
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [currentModel, setCurrentModel] = useState<number>(-1);
-  const [results, setResults] = useState<ModelResult[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<ModelResult[]>(
+    MODELS.map((m) => ({
+      model: m.id,
+      label: m.label,
+      image: null,
+      error: null,
+      cost: null,
+      status: "idle",
+    }))
+  );
+  const [generatingModel, setGeneratingModel] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = useCallback((file: File) => {
     if (file && file.type.startsWith("image/")) {
       if (file.size > 10 * 1024 * 1024) {
-        setError("Image too large. Max 10MB.");
+        alert("Image too large. Max 10MB.");
         return;
       }
       setUploadedFile(file);
-      setError(null);
-      setResults([]);
+      // Reset results when new file uploaded
+      setResults(MODELS.map((m) => ({
+        model: m.id,
+        label: m.label,
+        image: null,
+        error: null,
+        cost: null,
+        status: "idle",
+      }));
       const reader = new FileReader();
       reader.onload = (e) => setUploadedPreview(e.target?.result as string);
       reader.readAsDataURL(file);
@@ -72,82 +84,64 @@ export default function TestPage() {
     [handleFileUpload]
   );
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (modelId: string) => {
     if (!uploadedFile) return;
-    setIsGenerating(true);
-    setError(null);
 
-    // Init all results as pending
-    const initial: ModelResult[] = MODELS.map((m) => ({
-      model: m.id,
-      label: m.label,
-      image: null,
-      error: null,
-      cost: null,
-      balanceBefore: null,
-      balanceAfter: null,
-      status: "pending",
-    }));
-    setResults(initial);
+    setGeneratingModel(modelId);
+    setResults((prev) =>
+      prev.map((r) =>
+        r.model === modelId
+          ? { ...r, status: "generating", error: null, image: null }
+          : r
+      )
+    );
 
-    for (let i = 0; i < MODELS.length; i++) {
-      setCurrentModel(i);
+    try {
+      const formData = new FormData();
+      formData.append("image", uploadedFile);
+      formData.append("style", selectedStyle);
+      formData.append("model", modelId);
+      formData.append("ratio", ratios[modelId]);
 
-      // Mark current as generating
-      setResults((prev) =>
-        prev.map((r, idx) => (idx === i ? { ...r, status: "generating" } : r))
-      );
+      const res = await fetch("/api/test-generate", { method: "POST", body: formData });
+      const data = await res.json();
 
-      try {
-        const formData = new FormData();
-        formData.append("image", uploadedFile);
-        formData.append("style", selectedStyle);
-        formData.append("model", MODELS[i].id);
-        formData.append("ratio", ratios[MODELS[i].id]);
-
-        const res = await fetch("/api/test-generate", { method: "POST", body: formData });
-        const data = await res.json();
-
-        if (!res.ok) {
-          setResults((prev) =>
-            prev.map((r, idx) =>
-              idx === i ? { ...r, status: "error", error: data.error || "Failed" } : r
-            )
-          );
-        } else {
-          setResults((prev) =>
-            prev.map((r, idx) =>
-              idx === i
-                ? {
-                    ...r,
-                    status: "done",
-                    image: data.image,
-                    cost: data.cost,
-                    balanceBefore: data.balanceBefore,
-                    balanceAfter: data.balanceAfter,
-                  }
-                : r
-            )
-          );
-        }
-      } catch (err) {
+      if (!res.ok) {
         setResults((prev) =>
-          prev.map((r, idx) =>
-            idx === i
-              ? { ...r, status: "error", error: err instanceof Error ? err.message : "Failed" }
+          prev.map((r) =>
+            r.model === modelId
+              ? { ...r, status: "error", error: data.error || "Failed" }
+              : r
+          )
+        );
+      } else {
+        setResults((prev) =>
+          prev.map((r) =>
+            r.model === modelId
+              ? {
+                  ...r,
+                  status: "done",
+                  image: data.image,
+                  cost: data.cost,
+                }
               : r
           )
         );
       }
+    } catch (err) {
+      setResults((prev) =>
+        prev.map((r) =>
+          r.model === modelId
+            ? { ...r, status: "error", error: err instanceof Error ? err.message : "Failed" }
+            : r
+        )
+      );
+    } finally {
+      setGeneratingModel(null);
     }
-
-    setCurrentModel(-1);
-    setIsGenerating(false);
   };
 
-  const totalCost = results
-    .filter((r) => r.cost && r.cost !== "N/A")
-    .reduce((sum, r) => sum + parseFloat(r.cost!), 0);
+  const anyGenerating = generatingModel !== null;
 
   const RatioSelect = ({ modelId, label }: { modelId: string; label: string }) => (
     <div className="flex items-center gap-2">
@@ -155,7 +149,8 @@ export default function TestPage() {
       <select
         value={ratios[modelId]}
         onChange={(e) => setRatios((prev) => ({ ...prev, [modelId]: e.target.value }))}
-        className="px-2.5 py-1.5 bg-[var(--cream)] border border-[var(--sage-light)] rounded-lg text-xs font-semibold text-[var(--earth)] cursor-pointer focus:outline-none focus:border-[var(--sage)]"
+        disabled={anyGenerating}
+        className="px-2.5 py-1.5 bg-[var(--cream)] border border-[var(--sage-light)] rounded-lg text-xs font-semibold text-[var(--earth)] cursor-pointer focus:outline-none focus:border-[var(--sage)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <optgroup label="Portrait">
           {ASPECT_RATIOS.filter((r) => r.group === "P").map((r) => (
@@ -195,7 +190,7 @@ export default function TestPage() {
             Model Comparison
           </h1>
           <p className="text-[15px] text-[var(--text-muted)] text-center mb-8">
-            Generates one model at a time and shows the cost per model
+            Upload a photo and click each model button to generate individually
           </p>
 
           {/* Upload area */}
@@ -235,7 +230,8 @@ export default function TestPage() {
                 {STYLES.map((s) => (
                   <button
                     key={s.id}
-                    className={"px-4 py-2.5 rounded-full border-2 text-sm font-semibold flex items-center gap-2 transition-all " + (selectedStyle === s.id ? "border-[var(--terracotta)] bg-[var(--terracotta)]/10 text-[var(--terracotta)]" : "border-[var(--sage-light)] bg-[var(--cream)] text-[var(--text)] hover:border-[var(--sage)]")}
+                    disabled={anyGenerating}
+                    className={"px-4 py-2.5 rounded-full border-2 text-sm font-semibold flex items-center gap-2 transition-all " + (selectedStyle === s.id ? "border-[var(--terracotta)] bg-[var(--terracotta)]/10 text-[var(--terracotta)]" : "border-[var(--sage-light)] bg-[var(--cream)] text-[var(--text)] hover:border-[var(--sage)]") + (anyGenerating ? " opacity-50 cursor-not-allowed" : "")}
                     onClick={() => setSelectedStyle(s.id)}
                   >
                     <span>{s.emoji}</span>
@@ -250,91 +246,65 @@ export default function TestPage() {
                   <RatioSelect key={m.id} modelId={m.id} label={m.label.split(" (")[0] + ":"} />
                 ))}
               </div>
-
-              {error && <div className="mt-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">{error}</div>}
-
-              <button
-                className="mt-6 w-full py-3.5 rounded-full bg-[var(--terracotta)] text-white text-base font-bold transition-all hover:bg-[var(--terracotta-dark)] disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleGenerate}
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <span className="flex items-center justify-center gap-3">
-                    <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full inline-block animate-spin" />
-                    Generating model {currentModel + 1} of {MODELS.length}...
-                  </span>
-                ) : "Generate All 3 (Sequential)"}
-              </button>
             </div>
           )}
         </div>
 
-        {/* Total cost banner */}
-        {results.length > 0 && results.some((r) => r.status === "done") && (
-          <div className="max-w-[1200px] mx-auto mb-6 p-4 bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 text-center">
-            <span className="text-sm text-[var(--text-muted)]">Total cost: </span>
-            <span className="text-lg font-bold text-[var(--earth)] font-mono">${totalCost.toFixed(4)}</span>
-            {results.some((r) => r.balanceAfter && r.balanceAfter !== "N/A") && (
-              <span className="text-sm text-[var(--text-muted)] ml-4">
-                Balance: <span className="font-mono font-semibold">${results.filter((r) => r.balanceAfter && r.balanceAfter !== "N/A").slice(-1)[0]?.balanceAfter}</span>
-              </span>
-            )}
-          </div>
-        )}
-
         {/* Results Grid */}
-        {results.length > 0 && (
+        {uploadedPreview && (
           <div className="grid md:grid-cols-3 gap-6 max-w-[1200px] mx-auto">
             {results.map((r, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-2xl border border-[var(--sage-light)]/30 overflow-hidden">
-                {/* Model label */}
+                {/* Model label + button */}
                 <div className="px-5 py-3 border-b border-[var(--sage-light)]/20 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
-                    <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
-                      {ratios[r.model]}
-                    </span>
-                  </div>
-                  {r.status === "done" && <span className="w-2 h-2 rounded-full bg-green-500" />}
-                  {r.status === "error" && <span className="w-2 h-2 rounded-full bg-red-500" />}
-                  {r.status === "generating" && (
-                    <span className="w-4 h-4 border-2 border-[var(--sage-light)] border-t-[var(--sage)] rounded-full animate-spin" />
-                  )}
-                  {r.status === "pending" && <span className="w-2 h-2 rounded-full bg-gray-300" />}
+                  <span className="text-sm font-semibold text-[var(--earth)]">{r.label}</span>
+                  <span className="text-[11px] text-[var(--text-muted)] bg-[var(--sand)] px-2 py-0.5 rounded-full">
+                    {ratios[r.model]}
+                  </span>
                 </div>
 
-                {/* Cost bar */}
-                {r.status === "done" && r.cost && (
-                  <div className="px-5 py-2 bg-[var(--sage)]/5 border-b border-[var(--sage-light)]/20 flex items-center justify-between">
-                    <span className="text-xs text-[var(--text-muted)]">Cost</span>
-                    <span className="text-sm font-bold font-mono text-[var(--earth)]">${r.cost}</span>
-                  </div>
-                )}
+                {/* Generate button or status */}
+                <div className="px-5 py-4 flex flex-col items-center gap-3">
+                  {r.status === "idle" && (
+                    <button
+                      onClick={() => handleGenerate(r.model)}
+                      disabled={anyGenerating}
+                      className="w-full py-2.5 rounded-full bg-[var(--terracotta)] text-white text-sm font-bold transition-all hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Generate
+                    </button>
+                  )}
 
-                {/* Content */}
-                <div className="p-4 min-h-[300px] flex items-center justify-center">
-                  {r.image ? (
-                    <img src={r.image} alt={r.label} className="w-full h-auto rounded-lg" />
-                  ) : r.error ? (
-                    <div className="text-center p-4">
-                      <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center bg-red-500/10 rounded-full">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                      </div>
-                      <p className="text-sm text-red-500 font-medium">Failed</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-1">{r.error}</p>
+                  {r.status === "generating" && (
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="w-6 h-6 border-2 border-[var(--sage-light)] border-t-[var(--terracotta)] rounded-full animate-spin" />
+                      <span className="text-sm text-[var(--text-muted)]">Generating...</span>
                     </div>
-                  ) : r.status === "generating" ? (
-                    <div className="text-center">
-                      <div className="w-12 h-12 mx-auto mb-3 border-3 border-[var(--sage-light)] border-t-[var(--sage)] rounded-full animate-spin" />
-                      <p className="text-sm text-[var(--text-muted)]">Generating...</p>
+                  )}
+
+                  {r.status === "done" && r.image && (
+                    <div className="w-full">
+                      <img src={r.image} alt={r.label} className="w-full h-auto rounded-lg mb-2" />
+                      {r.cost && (
+                        <div className="flex items-center justify-center gap-2 text-sm">
+                          <span className="text-[var(--text-muted)]">Cost:</span>
+                          <span className="font-bold font-mono text-[var(--earth)]">${r.cost}</span>
+                        </div>
+                      )}
                     </div>
-                  ) : (
+                  )}
+
+                  {r.status === "error" && (
                     <div className="text-center">
-                      <p className="text-sm text-[var(--text-muted)]">Waiting...</p>
+                      <p className="text-sm text-red-500 font-medium mb-2">Failed</p>
+                      <p className="text-xs text-[var(--text-muted)]">{r.error}</p>
+                      <button
+                        onClick={() => handleGenerate(r.model)}
+                        disabled={anyGenerating}
+                        className="mt-3 px-4 py-1.5 rounded-full border border-red-300 text-red-600 text-xs font-semibold hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Retry
+                      </button>
                     </div>
                   )}
                 </div>
