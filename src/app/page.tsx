@@ -212,7 +212,7 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--cream)] border-2 border-[var(--sage-light)] rounded-full text-[13px] font-semibold text-[var(--sage-dark)] mb-6">
                 Feito com carinho
               </div>
-              <h1 className="font-cherry-bomb text-[44px] md:text-[60px] font-normal leading-[1.1] text-[var(--earth)] mb-6">
+              <h1 className="font-display text-[44px] md:text-[60px] font-normal leading-[1.1] text-[var(--earth)] mb-6">
                 Seu pet como <span className="text-[var(--terracotta)]">obra de arte</span>
               </h1>
               <p className="text-lg text-[var(--text-muted)] leading-relaxed mb-10">
@@ -233,15 +233,15 @@ export default function Home() {
             <div className="relative h-[400px] md:h-[500px] hidden md:block">
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10" style={{ top: 20, left: 20, transform: "rotate(-8deg)" }}>
                 <Image src="/figma/hero-renaissance.png" alt="Max - Renascença" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Max - Renascença</span>
+                <span className="absolute bottom-3 left-0 right-0 text-center font-display text-sm text-[var(--text-muted)]">Max - Renascença</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[1]" style={{ top: 60, left: 140, transform: "rotate(5deg)" }}>
                 <Image src="/figma/hero-baroque.png" alt="Luna - Barroco" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Luna - Barroco</span>
+                <span className="absolute bottom-3 left-0 right-0 text-center font-display text-sm text-[var(--text-muted)]">Luna - Barroco</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[2]" style={{ top: 180, left: 60, transform: "rotate(-3deg)" }}>
                 <Image src="/figma/hero-victorian.png" alt="Thor - Vitoriano" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
+                <span className="absolute bottom-3 left-0 right-0 text-center font-display text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
               </div>
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function Home() {
         <section id="upload" className="py-[80px] px-6 md:px-12">
           <div className="max-w-[680px] mx-auto text-center">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">CRIAR RETRATO</span>
-            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
+            <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
             <p className="text-[17px] text-[var(--text-muted)] mb-10">Uma foto clara e bem iluminada vai gerar o melhor resultado</p>
 
             <div
@@ -319,7 +319,7 @@ export default function Home() {
         <section id="process" className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">COMO FUNCIONA</span>
-            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
+            <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Três passos para eternizar seu companheiro</p>
           </div>
           <div className="bg-[var(--cream)] rounded-[32px] p-8 md:p-16 max-w-[1000px] mx-auto">
@@ -331,9 +331,9 @@ export default function Home() {
               ].map((step, i) => (
                 <div key={i} className="text-center">
                   <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--sand)] rounded-full">
-                    <span className="font-cherry-bomb text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
+                    <span className="font-display text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
                   </div>
-                  <h3 className="font-cherry-bomb text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
+                  <h3 className="font-display text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
                   <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">{step.desc}</p>
                 </div>
               ))}
@@ -351,7 +351,7 @@ export default function Home() {
         <section className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">ESTILOS</span>
-            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Retratos que transformam pets em arte</h2>
+            <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Retratos que transformam pets em arte</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Cada estilo revela um lado único do seu companheiro</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
@@ -363,7 +363,7 @@ export default function Home() {
               <div key={i} className="bg-[var(--cream)] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_48px_rgba(0,0,0,0.1)]">
                 <Image src={item.img} alt={item.name} width={400} height={320} className="w-full h-[280px] md:h-[320px] object-cover" />
                 <div className="p-6 text-center">
-                  <h3 className="font-cherry-bomb text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
+                  <h3 className="font-display text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
                   <span className="text-sm text-[var(--text-muted)]">{item.desc}</span>
                 </div>
               </div>
@@ -375,7 +375,7 @@ export default function Home() {
         <section className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">DEPOIMENTOS</span>
-            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Quem já transformou seu pet em obra de arte</h2>
+            <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Quem já transformou seu pet em obra de arte</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Centenas de pets já ganharam seu retrato artístico</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
@@ -406,7 +406,7 @@ export default function Home() {
         <section id="gallery" className="py-[100px] px-6 md:px-12 bg-[var(--sand)]">
           <div className="max-w-[1200px] mx-auto text-center">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">PRODUTO</span>
-            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Seu pet como você nunca viu</h2>
+            <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Seu pet como você nunca viu</h2>
             <p className="text-[17px] text-[var(--text-muted)] mb-10 leading-relaxed max-w-[680px] mx-auto">
               Impresso em alta qualidade e finalizado com moldura preta produzida em impressora 3D, pronto para decorar sua casa ou presentear alguém especial.
             </p>
@@ -488,7 +488,7 @@ export default function Home() {
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </div>
-              <h3 className="font-cherry-bomb text-[24px] font-semibold text-[var(--earth)] mb-2">
+              <h3 className="font-display text-[24px] font-semibold text-[var(--earth)] mb-2">
                 Crie uma conta para continuar gerando!
               </h3>
               <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">
@@ -535,7 +535,7 @@ export default function Home() {
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 </svg>
               </div>
-              <h3 className="font-cherry-bomb text-[24px] font-semibold text-[var(--earth)] mb-2">
+              <h3 className="font-display text-[24px] font-semibold text-[var(--earth)] mb-2">
                 Você atingiu o limite de 3 retratos gratuitos!
               </h3>
               <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">

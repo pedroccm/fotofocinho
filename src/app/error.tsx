@@ -21,7 +21,7 @@ export default function Error({
             </svg>
           </div>
 
-          <h1 className="font-[var(--font-fraunces)] text-3xl md:text-4xl font-medium text-[var(--earth)] mb-3">
+          <h1 className="font-display text-3xl md:text-4xl font-medium text-[var(--earth)] mb-3">
             Something went wrong
           </h1>
           <p className="text-[var(--text-muted)] text-base leading-relaxed mb-8">

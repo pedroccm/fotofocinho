@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { STYLES } from "@/lib/constants";
 
 const ASPECT_RATIOS = [
@@ -189,8 +190,8 @@ export default function TestPage() {
     <div className="min-h-screen bg-[var(--sand)]">
       {/* Header */}
       <nav className="px-6 md:px-12 py-5 flex items-center justify-between border-b border-black/5">
-        <Link href="/" className="font-[var(--font-fraunces)] text-[24px] font-semibold text-[var(--earth)]">
-          fotofocinho
+        <Link href="/">
+          <Image src="/logo.png" alt="Fotofocinho" width={140} height={42} className="h-8 w-auto" />
         </Link>
         <span className="px-3 py-1 bg-[var(--sage)]/10 border border-[var(--sage-light)] rounded-full text-xs font-semibold text-[var(--sage-dark)]">
           Model Comparison
@@ -200,7 +201,7 @@ export default function TestPage() {
       <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-10">
         {/* Upload + Controls */}
         <div className="max-w-[600px] mx-auto mb-10">
-          <h1 className="font-[var(--font-fraunces)] text-[32px] font-medium text-[var(--earth)] mb-2 text-center">
+          <h1 className="font-display text-[32px] font-medium text-[var(--earth)] mb-2 text-center">
             Model Comparison
           </h1>
           <p className="text-[15px] text-[var(--text-muted)] text-center mb-8">

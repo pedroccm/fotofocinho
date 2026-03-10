@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function NotFound() {
   return (
@@ -9,8 +10,8 @@ export default function NotFound() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
-          fotofocinho
+        <Link href="/">
+          <Image src="/logo.png" alt="Fotofocinho" width={160} height={48} className="h-10 w-auto" />
         </Link>
       </nav>
 
@@ -25,10 +26,10 @@ export default function NotFound() {
             </svg>
           </div>
 
-          <h1 className="font-[var(--font-fraunces)] text-5xl md:text-6xl font-medium text-[var(--earth)] mb-3">
+          <h1 className="font-display text-5xl md:text-6xl font-medium text-[var(--earth)] mb-3">
             404
           </h1>
-          <h2 className="font-[var(--font-fraunces)] text-2xl font-medium text-[var(--earth)] mb-4">
+          <h2 className="font-display text-2xl font-medium text-[var(--earth)] mb-4">
             Page not found
           </h2>
           <p className="text-[var(--text-muted)] text-base leading-relaxed mb-8">

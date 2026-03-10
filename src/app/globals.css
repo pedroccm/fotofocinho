@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-cherry-bomb: var(--font-cherry-bomb), "Cherry Bomb One", cursive;
-  --font-nunito: var(--font-nunito), "Nunito", sans-serif;
-  --font-fraunces: var(--font-fraunces), "Fraunces", serif;
+  --font-display: var(--font-cherry-bomb), "Cherry Bomb One", cursive;
+  --font-body: var(--font-nunito), "Nunito", sans-serif;
+  --font-serif: var(--font-fraunces), "Fraunces", serif;
 }
 
 :root {

@@ -134,8 +134,8 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
 
       {/* Navigation (same style as homepage) */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
-          fotofocinho
+        <Link href="/">
+          <Image src="/logo.png" alt="Fotofocinho" width={160} height={48} className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-2">
           <Link
@@ -158,7 +158,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
       <div className="relative z-10 max-w-[1000px] mx-auto px-6 pt-[120px] pb-12">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium leading-[1.1] text-[var(--earth)] mb-2">
+          <h1 className="font-display text-[36px] md:text-[44px] font-medium leading-[1.1] text-[var(--earth)] mb-2">
             Ola, {userName}!
           </h1>
           <p className="text-[var(--text-muted)] text-sm">{userEmail}</p>
@@ -166,7 +166,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
 
         {/* Orders */}
         <div>
-          <h2 className="font-[var(--font-fraunces)] text-xl font-semibold mb-6 flex items-center gap-2">
+          <h2 className="font-display text-xl font-semibold mb-6 flex items-center gap-2">
             <span className="text-[var(--terracotta)]">Meus Pedidos</span>
             <span className="text-[var(--text-muted)] text-sm font-normal">({orders.length})</span>
           </h2>
@@ -272,7 +272,7 @@ export default function CustomerDashboard({ userName, userEmail, orders }: Props
 
         {/* Change Password */}
         <div className="mt-12">
-          <h2 className="font-[var(--font-fraunces)] text-xl font-semibold mb-6 text-[var(--terracotta)]">
+          <h2 className="font-display text-xl font-semibold mb-6 text-[var(--terracotta)]">
             Alterar Senha
           </h2>
           <div className="bg-[var(--cream)] border border-[var(--sage-light)]/30 rounded-2xl p-6 max-w-[400px]">

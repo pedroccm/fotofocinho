@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase-browser";
 
 export default function LoginPage() {
@@ -55,16 +56,11 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[var(--sand)] flex items-center justify-center px-6">
       <div className="w-full max-w-[400px]">
         <Link href="/" className="flex flex-col items-center mb-10">
-          <span className="font-[var(--font-fraunces)] text-[32px] font-bold tracking-tight leading-none">
-            Fotofocinho
-          </span>
-          <span className="text-[9px] font-medium tracking-[0.3em] text-[var(--text)]/40 mt-0.5">
-            PET PORTRAITS
-          </span>
+          <Image src="/logo.png" alt="Fotofocinho" width={200} height={60} className="h-14 w-auto" />
         </Link>
 
         <div className="bg-[var(--cream)] border border-[var(--sage-light)]/30 rounded-2xl p-8">
-          <h1 className="font-[var(--font-fraunces)] text-2xl font-bold text-center mb-2">
+          <h1 className="font-display text-2xl font-bold text-center mb-2">
             Bem-vindo de volta
           </h1>
           <p className="text-sm text-[var(--text)]/50 text-center mb-8">

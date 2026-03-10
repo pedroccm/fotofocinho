@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 function ThankYouContent() {
   const searchParams = useSearchParams();
@@ -18,8 +19,8 @@ function ThankYouContent() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
-          fotofocinho
+        <Link href="/">
+          <Image src="/logo.png" alt="Fotofocinho" width={160} height={48} className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/" className="px-5 py-2.5 text-sm font-bold text-white bg-[var(--sage)] rounded-full transition-all hover:bg-[var(--sage-dark)]">
@@ -37,7 +38,7 @@ function ThankYouContent() {
             </svg>
           </div>
 
-          <h1 className="font-[var(--font-fraunces)] text-4xl md:text-5xl font-medium text-[var(--earth)] mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-medium text-[var(--earth)] mb-4">
             Obrigado!
           </h1>
 
@@ -65,7 +66,7 @@ function ThankYouContent() {
 
           {isPhysical && (
             <div className="bg-[var(--cream)] border-2 border-[var(--sage-light)] rounded-2xl p-6 mb-8 text-left">
-              <h3 className="font-[var(--font-fraunces)] text-lg font-semibold mb-3 text-[var(--terracotta)]">
+              <h3 className="font-display text-lg font-semibold mb-3 text-[var(--terracotta)]">
                 Próximos passos
               </h3>
               <ul className="space-y-2 text-sm text-[var(--text-muted)]">
