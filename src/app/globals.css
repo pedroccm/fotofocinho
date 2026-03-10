@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --font-cherry-bomb: var(--font-cherry-bomb), "Cherry Bomb One", cursive;
+  --font-nunito: var(--font-nunito), "Nunito", sans-serif;
+  --font-fraunces: var(--font-fraunces), "Fraunces", serif;
+}
+
 :root {
   --sage: #9CAF88;
   --sage-dark: #7A8F6C;

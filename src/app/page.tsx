@@ -22,6 +22,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -140,8 +141,8 @@ export default function Home() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between bg-gradient-to-b from-[var(--sand)] to-transparent">
-        <Link href="/" className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)]">
-          fotofocinho
+        <Link href="/">
+          <Image src="/logo.png" alt="Fotofocinho" width={160} height={48} className="h-10 w-auto" />
         </Link>
         <div className="hidden md:flex items-center gap-2">
           <a href="#process" className="px-5 py-2.5 text-sm font-semibold text-[var(--text-muted)] rounded-full transition-all hover:text-[var(--text)] hover:bg-[var(--sage)]/20">Processo</a>
@@ -211,8 +212,8 @@ export default function Home() {
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--cream)] border-2 border-[var(--sage-light)] rounded-full text-[13px] font-semibold text-[var(--sage-dark)] mb-6">
                 Feito com carinho
               </div>
-              <h1 className="font-[var(--font-fraunces)] text-[44px] md:text-[60px] font-medium leading-[1.1] text-[var(--earth)] mb-6">
-                Seu pet como <span className="text-[var(--terracotta)] italic">obra de arte</span>
+              <h1 className="font-cherry-bomb text-[44px] md:text-[60px] font-normal leading-[1.1] text-[var(--earth)] mb-6">
+                Seu pet como <span className="text-[var(--terracotta)]">obra de arte</span>
               </h1>
               <p className="text-lg text-[var(--text-muted)] leading-relaxed mb-10">
                 Criamos retratos artísticos únicos do seu melhor amigo, combinando inteligência artificial com estilos clássicos de pintura.
@@ -231,16 +232,16 @@ export default function Home() {
             {/* Polaroid Stack */}
             <div className="relative h-[400px] md:h-[500px] hidden md:block">
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10" style={{ top: 20, left: 20, transform: "rotate(-8deg)" }}>
-                <Image src="/samples/output/dog1/renaissance.jpg" alt="Max - Renascença" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Max - Renascença</span>
+                <Image src="/figma/hero-renaissance.png" alt="Max - Renascença" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Max - Renascença</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[1]" style={{ top: 60, left: 140, transform: "rotate(5deg)" }}>
-                <Image src="/samples/output/gato/baroque.jpg" alt="Luna - Barroco" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Luna - Barroco</span>
+                <Image src="/figma/hero-baroque.png" alt="Luna - Barroco" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Luna - Barroco</span>
               </div>
               <div className="absolute w-[240px] md:w-[280px] bg-white p-4 pb-12 rounded shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all hover:!rotate-0 hover:scale-105 hover:z-10 z-[2]" style={{ top: 180, left: 60, transform: "rotate(-3deg)" }}>
-                <Image src="/samples/output/dog2/victorian.jpg" alt="Thor - Vitoriano" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
-                <span className="absolute bottom-3 left-0 right-0 text-center font-[var(--font-fraunces)] text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
+                <Image src="/figma/hero-victorian.png" alt="Thor - Vitoriano" width={280} height={260} className="w-full h-[200px] md:h-[260px] object-cover rounded-sm" />
+                <span className="absolute bottom-3 left-0 right-0 text-center font-cherry-bomb text-sm text-[var(--text-muted)]">Thor - Vitoriano</span>
               </div>
             </div>
           </div>
@@ -250,7 +251,7 @@ export default function Home() {
         <section id="upload" className="py-[80px] px-6 md:px-12">
           <div className="max-w-[680px] mx-auto text-center">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">CRIAR RETRATO</span>
-            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
+            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Envie a foto do seu pet</h2>
             <p className="text-[17px] text-[var(--text-muted)] mb-10">Uma foto clara e bem iluminada vai gerar o melhor resultado</p>
 
             <div
@@ -318,7 +319,7 @@ export default function Home() {
         <section id="process" className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">COMO FUNCIONA</span>
-            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
+            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Simples e encantador</h2>
             <p className="text-[17px] text-[var(--text-muted)]">Três passos para eternizar seu companheiro</p>
           </div>
           <div className="bg-[var(--cream)] rounded-[32px] p-8 md:p-16 max-w-[1000px] mx-auto">
@@ -330,33 +331,39 @@ export default function Home() {
               ].map((step, i) => (
                 <div key={i} className="text-center">
                   <div className="w-16 h-16 mx-auto mb-5 flex items-center justify-center bg-[var(--sand)] rounded-full">
-                    <span className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
+                    <span className="font-cherry-bomb text-[28px] font-semibold text-[var(--terracotta)]">{step.num}</span>
                   </div>
-                  <h3 className="font-[var(--font-fraunces)] text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
+                  <h3 className="font-cherry-bomb text-[22px] font-medium text-[var(--earth)] mb-3">{step.title}</h3>
                   <p className="text-[15px] text-[var(--text-muted)] leading-relaxed">{step.desc}</p>
                 </div>
               ))}
             </div>
           </div>
+          <div className="flex justify-center mt-12">
+            <a href="#upload" className="inline-flex items-center gap-2.5 px-8 py-4 bg-[var(--terracotta)] text-white text-[16px] font-bold rounded-full transition-all hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(193,127,89,0.3)]">
+              Criar retrato
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </section>
 
         {/* Gallery Section */}
-        <section id="gallery" className="py-[100px] px-6 md:px-12">
+        <section className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">ESTILOS</span>
-            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Nossa galeria</h2>
-            <p className="text-[17px] text-[var(--text-muted)]">Cada estilo conta uma história diferente</p>
+            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Retratos que transformam pets em arte</h2>
+            <p className="text-[17px] text-[var(--text-muted)]">Cada estilo revela um lado único do seu companheiro</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
             {[
-              { img: "/samples/output/dog3/renaissance.jpg", name: "Renascença", desc: "Clássico e atemporal" },
-              { img: "/samples/output/gato2/baroque.jpg", name: "Barroco", desc: "Dramático e elegante" },
-              { img: "/samples/output/dog4/victorian.jpg", name: "Vitoriano", desc: "Nobre e majestoso" },
+              { img: "/figma/style-renaissance.png", name: "Renascença", desc: "Clássico e atemporal" },
+              { img: "/figma/style-baroque.png", name: "Barroco", desc: "Dramático e elegante" },
+              { img: "/figma/style-victorian.png", name: "Vitoriano", desc: "Nobre e majestoso" },
             ].map((item, i) => (
               <div key={i} className="bg-[var(--cream)] rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_16px_48px_rgba(0,0,0,0.1)]">
                 <Image src={item.img} alt={item.name} width={400} height={320} className="w-full h-[280px] md:h-[320px] object-cover" />
                 <div className="p-6 text-center">
-                  <h3 className="font-[var(--font-fraunces)] text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
+                  <h3 className="font-cherry-bomb text-xl font-medium text-[var(--earth)] mb-1">{item.name}</h3>
                   <span className="text-sm text-[var(--text-muted)]">{item.desc}</span>
                 </div>
               </div>
@@ -368,8 +375,8 @@ export default function Home() {
         <section className="py-[100px] px-6 md:px-12">
           <div className="text-center max-w-[600px] mx-auto mb-16">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">DEPOIMENTOS</span>
-            <h2 className="font-[var(--font-fraunces)] text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">O que dizem nossos clientes</h2>
-            <p className="text-[17px] text-[var(--text-muted)]">Mais de 500 pets transformados em obras de arte</p>
+            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Quem já transformou seu pet em obra de arte</h2>
+            <p className="text-[17px] text-[var(--text-muted)]">Centenas de pets já ganharam seu retrato artístico</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 max-w-[1000px] mx-auto">
             {[
@@ -395,6 +402,54 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Product Section */}
+        <section id="gallery" className="py-[100px] px-6 md:px-12 bg-[var(--sand)]">
+          <div className="max-w-[1200px] mx-auto text-center">
+            <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">PRODUTO</span>
+            <h2 className="font-cherry-bomb text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Seu pet como você nunca viu</h2>
+            <p className="text-[17px] text-[var(--text-muted)] mb-10 leading-relaxed max-w-[680px] mx-auto">
+              Impresso em alta qualidade e finalizado com moldura preta produzida em impressora 3D, pronto para decorar sua casa ou presentear alguém especial.
+            </p>
+            <div className="relative group">
+              <div
+                ref={carouselRef}
+                className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-hide"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <div key={n} className="flex-none snap-center w-[240px] md:w-[280px] h-[320px] md:h-[380px] bg-[var(--cream)] rounded-2xl flex items-center justify-center p-2.5">
+                    <Image
+                      src={`/figma/product-frame-${n}.png`}
+                      alt={`Retrato emoldurado ${n}`}
+                      width={275}
+                      height={348}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => carouselRef.current?.scrollBy({ left: -300, behavior: "smooth" })}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm border border-[var(--terracotta)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                aria-label="Previous"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" strokeWidth="1.7"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button
+                onClick={() => carouselRef.current?.scrollBy({ left: 300, behavior: "smooth" })}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm border border-[var(--terracotta)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                aria-label="Next"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" strokeWidth="1.7"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <a href="#upload" className="inline-flex items-center gap-2.5 mt-10 px-8 py-4 bg-[var(--terracotta)] text-white text-[16px] font-bold rounded-full transition-all hover:bg-[var(--terracotta-dark)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(193,127,89,0.3)]">
+              Criar retrato
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </section>
+
         {/* Result + Checkout Flow (inline, replaces modals) */}
         {generatedImage && generationId && (
           <ResultCheckoutFlow
@@ -406,8 +461,8 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="py-12 px-6 md:px-12 text-center border-t border-black/5">
-          <div className="font-[var(--font-fraunces)] text-[28px] font-semibold text-[var(--earth)] mb-2">fotofocinho</div>
-          <p className="text-sm text-[var(--text-muted)]">{new Date().getFullYear()} Fotofocinho. Feito com amor para pets.</p>
+          <div className="mb-2"><Image src="/logo.png" alt="Fotofocinho" width={160} height={48} className="h-10 w-auto mx-auto" /></div>
+          <p className="text-sm text-[var(--text-muted)]">{new Date().getFullYear()} Fotofocinho. Feito com amor para o seu Pet.</p>
         </footer>
       </div>
 
@@ -433,7 +488,7 @@ export default function Home() {
                   <circle cx="12" cy="7" r="4" />
                 </svg>
               </div>
-              <h3 className="font-[var(--font-fraunces)] text-[24px] font-semibold text-[var(--earth)] mb-2">
+              <h3 className="font-cherry-bomb text-[24px] font-semibold text-[var(--earth)] mb-2">
                 Crie uma conta para continuar gerando!
               </h3>
               <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">
@@ -480,7 +535,7 @@ export default function Home() {
                   <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 </svg>
               </div>
-              <h3 className="font-[var(--font-fraunces)] text-[24px] font-semibold text-[var(--earth)] mb-2">
+              <h3 className="font-cherry-bomb text-[24px] font-semibold text-[var(--earth)] mb-2">
                 Você atingiu o limite de 3 retratos gratuitos!
               </h3>
               <p className="text-[15px] text-[var(--text-muted)] mb-8 leading-relaxed">
