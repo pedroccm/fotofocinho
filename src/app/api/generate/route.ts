@@ -31,18 +31,22 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     // Check generation limits
+    const UNLIMITED_EMAILS = ["pedroccm@gmail.com"];
     if (user) {
-      const { count } = await supabaseAdmin
-        .from("pets_generations")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("status", "completed");
+      const isUnlimited = UNLIMITED_EMAILS.includes(user.email ?? "");
+      if (!isUnlimited) {
+        const { count } = await supabaseAdmin
+          .from("pets_generations")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .eq("status", "completed");
 
-      if ((count ?? 0) >= AUTH_LIMIT) {
-        return NextResponse.json(
-          { error: "LIMIT_REACHED", message: "Você atingiu o limite de 3 retratos gratuitos!" },
-          { status: 429 }
-        );
+        if ((count ?? 0) >= AUTH_LIMIT) {
+          return NextResponse.json(
+            { error: "LIMIT_REACHED", message: "Você atingiu o limite de 3 retratos gratuitos!" },
+            { status: 429 }
+          );
+        }
       }
     } else {
       const { count } = await supabaseAdmin
