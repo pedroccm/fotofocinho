@@ -403,7 +403,7 @@ export default function Home() {
         </section>
 
         {/* Product Section */}
-        <section id="gallery" className="py-[100px] px-6 md:px-12 bg-[var(--sand)]">
+        <section id="gallery" className="py-[100px] px-6 md:px-12">
           <div className="max-w-[1200px] mx-auto text-center">
             <span className="inline-block text-xs font-bold tracking-[0.15em] uppercase text-[var(--sage)] mb-3">PRODUTO</span>
             <h2 className="font-display text-[36px] md:text-[44px] font-medium text-[var(--earth)] mb-4">Seu pet como você nunca viu</h2>

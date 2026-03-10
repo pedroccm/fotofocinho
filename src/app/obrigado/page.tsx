@@ -47,7 +47,7 @@ function ThankYouContent() {
               <>
                 Seu pedido foi confirmado! Estamos preparando seu{" "}
                 <span className="text-[var(--terracotta)] font-semibold">
-                  {product === "canvas" ? "Quadro Canvas" : "Fine Art Print"}
+                  {product === "canvas" ? "Quadro 15×10 cm" : "Quadro 15×21 cm"}
                 </span>{" "}
                 com carinho. Você receberá um e-mail com o código de rastreio assim
                 que enviarmos.

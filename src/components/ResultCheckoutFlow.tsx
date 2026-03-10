@@ -433,7 +433,7 @@ export default function ResultCheckoutFlow({
                 </div>
                 <div className="bg-[var(--cream)] text-center py-3 px-4">
                   <p className="text-[11px] text-[var(--text-muted)]">
-                    {selectedProduct.type === "canvas" ? "Preview: Canvas na parede" : "Preview: Fine Art Print emoldurado"}
+                    Preview: {selectedProduct.name} na parede
                   </p>
                 </div>
               </div>
@@ -505,6 +505,12 @@ export default function ResultCheckoutFlow({
                         <p className="text-sm text-[var(--text-muted)]">
                           {plan.features.join(" · ")}
                         </p>
+                        {plan.freeShipping && (
+                          <span className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-[var(--success)]/15 text-[var(--success)] text-xs font-bold rounded-full">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            Frete grátis
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-4">
                         <span className={`font-display text-[32px] font-semibold ${
@@ -820,7 +826,7 @@ export default function ResultCheckoutFlow({
                       <>
                         Seu pedido foi confirmado! Estamos preparando seu{" "}
                         <span className="text-[var(--terracotta)] font-semibold">
-                          {selectedProduct?.type === "canvas" ? "Quadro Canvas" : "Fine Art Print"}
+                          {selectedProduct?.name}
                         </span>{" "}
                         com carinho. Você receberá um e-mail com o código de rastreio assim que enviarmos.
                       </>

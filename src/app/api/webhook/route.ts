@@ -4,8 +4,8 @@ import { sendDigitalDownloadEmail, sendOrderConfirmationEmail } from "@/lib/emai
 
 const PRODUCT_NAMES: Record<string, string> = {
   digital: "Download Digital",
-  print: "Fine Art Print",
-  canvas: "Quadro Canvas",
+  print: "Quadro 15×21 cm",
+  canvas: "Quadro 15×10 cm",
 };
 
 export async function POST(request: NextRequest) {
