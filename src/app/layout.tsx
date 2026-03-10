@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Nunito } from "next/font/google";
+import { Fraunces, Nunito, Cherry_Bomb_One } from "next/font/google";
 import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
@@ -12,6 +12,13 @@ const fraunces = Fraunces({
 const nunito = Nunito({
   subsets: ["latin"],
   variable: "--font-nunito",
+  display: "swap",
+});
+
+const cherryBomb = Cherry_Bomb_One({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-cherry-bomb",
   display: "swap",
 });
 
@@ -57,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${fraunces.variable} ${nunito.variable}`}>
+    <html lang="pt-BR" className={`${fraunces.variable} ${nunito.variable} ${cherryBomb.variable}`}>
       <head>
         <script
           defer
